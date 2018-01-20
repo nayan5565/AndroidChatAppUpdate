@@ -1,11 +1,10 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -22,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.dev.chatapplication.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -176,7 +176,7 @@ public class RegisActivity extends AppCompatActivity implements View.OnClickList
                             currentUserId.child("Name").setValue(user);
                             currentUserId.child("Email").setValue(email);
                             Toast.makeText(RegisActivity.this, "Successfully registration", Toast.LENGTH_SHORT).show();
-                            Utils.savePref("userName", user);
+//                            Utils.savePref("userName", user);
                             startActivity(new Intent(RegisActivity.this, LoginActivity.class));
                             finish();
                         }

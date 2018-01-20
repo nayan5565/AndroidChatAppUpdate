@@ -1,4 +1,6 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.model;
+
+import com.example.dev.chatapplication.tools.Status;
 
 /**
  * Created by Dev on 1/17/2018.

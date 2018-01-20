@@ -1,7 +1,9 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.example.dev.chatapplication.model.User;
 
 /**
  * Created by Dev on 1/17/2018.

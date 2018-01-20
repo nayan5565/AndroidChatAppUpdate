@@ -1,33 +1,28 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.model.Message;
+import com.example.dev.chatapplication.tools.Utils;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,10 +38,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -62,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static String name = "";
     public static String userName = "good";
     public static String userName2 = "";
+    public static int userPos;
 
     private ArrayList<String> friends;
 
@@ -90,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         firebaseAuth = FirebaseAuth.getInstance();
 
         Log.e("name", name);
-        authStateListener = new FirebaseAuth.AuthStateListener() {
+        authStateListener = new FirebaseAuth.AuthStateListener()
+        {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() == null) {
@@ -99,33 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-        FirebaseDatabase.getInstance().getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() != null) {
-//
-//                    Friend user = new Friend();
-//                    HashMap mapUserInfo = (HashMap) dataSnapshot.getValue();
-//                    user.name = (String) mapUserInfo.get("Name");
-//                    Log.e("friends", " huy  " + user.name);
-//                    friends.add(user);
-//                }
-                HashMap mapRecord = (HashMap) dataSnapshot.getValue();
-                Iterator listKey = mapRecord.keySet().iterator();
-                while (listKey.hasNext()) {
-                    String key = listKey.next().toString();
-                    friends.add(mapRecord.get(key).toString());
-                    Log.e("friends", " listKey  " + mapRecord.get(key).toString());
-                }
-                Log.e("friends", "  is " + friends.get(1) + " size " + friends.size());
-                Log.e("friends", " dataSnapshot  one " + dataSnapshot.child("Name").getValue());
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         FirebaseDatabase.getInstance().getReference().child("message").addChildEventListener(new ChildEventListener() {
 
             @Override
@@ -175,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onDataChange(final DataSnapshot dataSnapshot) {
 
                         newPost.child("content").setValue(messageValue);
-                        newPost.child("userName").setValue(dataSnapshot.child("Name").getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        newPost.child("userName").setValue(dataSnapshot.child("Email").getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
 
-                                    userName = dataSnapshot.child("Name").getValue() + "";
+                                    userName = dataSnapshot.child("Email").getValue() + "";
                                     if (userName2.equals("well"))
                                         Utils.savePref("userName", userName);
                                     Log.e("userName", userName + " is " + dataSnapshot.child("Name").getValue());
@@ -207,11 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private String getToday() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy \n hh:mm:ss");
-        String day = sdf.format(new Date());
-        return day;
-    }
+
 
     @Override
     protected void onStart() {
@@ -227,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e("VH", " data " + userName2 + model.getContent());
 
 
-                viewHolder.setData(model.getUserName(), getToday(), model.getContent());
+                viewHolder.setData(model.getUserName(), Utils.getToday(), model.getContent());
             }
         };
         recMessage.setAdapter(firebaseRecyclerAdapter);

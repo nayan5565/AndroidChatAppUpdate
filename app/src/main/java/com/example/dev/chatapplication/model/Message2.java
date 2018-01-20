@@ -1,4 +1,4 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.model;
 
 /**
  * Created by Dev on 1/17/2018.
