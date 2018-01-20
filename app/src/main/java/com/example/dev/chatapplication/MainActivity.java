@@ -44,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static String userName = "good";
     public static String userName2 = "";
 
-    private ArrayList<Friend> friends;
+    private ArrayList<String> friends;
 
 
     @Override
@@ -101,14 +102,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseDatabase.getInstance().getReference().child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {
-                    Friend user = new Friend();
-                    HashMap mapUserInfo = (HashMap) dataSnapshot.getValue();
-                    user.name = (String) mapUserInfo.get("Name");
-                    friends.add(user);
+//                if (dataSnapshot.getValue() != null) {
+//
+//                    Friend user = new Friend();
+//                    HashMap mapUserInfo = (HashMap) dataSnapshot.getValue();
+//                    user.name = (String) mapUserInfo.get("Name");
+//                    Log.e("friends", " huy  " + user.name);
+//                    friends.add(user);
+//                }
+                HashMap mapRecord = (HashMap) dataSnapshot.getValue();
+                Iterator listKey = mapRecord.keySet().iterator();
+                while (listKey.hasNext()) {
+                    String key = listKey.next().toString();
+                    friends.add(mapRecord.get(key).toString());
+                    Log.e("friends", " listKey  " + mapRecord.get(key).toString());
                 }
-
-                Log.e("friends", " size is " + friends.get(0).name + friends.size());
+                Log.e("friends", "  is " + friends.get(1) + " size " + friends.size());
+                Log.e("friends", " dataSnapshot  one " + dataSnapshot.child("Name").getValue());
             }
 
             @Override
