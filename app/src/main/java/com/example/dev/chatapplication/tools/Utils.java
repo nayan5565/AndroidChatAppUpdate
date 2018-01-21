@@ -1,4 +1,4 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.tools;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,7 +28,7 @@ public class Utils {
     }
 
     public static String getToday() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy" + "/n" + "hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         String day = sdf.format(new Date());
         return day;
     }

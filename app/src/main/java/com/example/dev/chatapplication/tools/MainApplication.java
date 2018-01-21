@@ -1,4 +1,4 @@
-package com.example.dev.chatapplication;
+package com.example.dev.chatapplication.tools;
 
 import android.app.Application;
 import android.content.Context;
