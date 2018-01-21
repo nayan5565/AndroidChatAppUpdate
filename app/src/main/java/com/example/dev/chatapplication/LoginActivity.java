@@ -37,6 +37,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText edtEmail, edtPass;
     private Button btnLogin;
     private FirebaseAuth firebaseAuth;
+
     private DatabaseReference databaseReference;
 
     private final Pattern VALID_EMAIL_ADDRESS_REGEX =
@@ -49,7 +50,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_new);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
         edtEmail = (EditText) findViewById(R.id.edtEmail2);
         edtPass = (EditText) findViewById(R.id.edtPass);
         btnLogin = (Button) findViewById(R.id.btnLogin2);
