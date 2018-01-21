@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".activity.TabActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,12 +22,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.RegisActivity"
+            android:name=".activity.RegistrationActvityNew"
             android:theme="@style/Translucent" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.LoginActivityNew"
             android:theme="@style/TranslucentBackground" />
-        <!--<activity android:name=".activity.MainActivity" />-->
+        <activity android:name=".activity.ChatActivity" />
     </application>
 
 </manifest>

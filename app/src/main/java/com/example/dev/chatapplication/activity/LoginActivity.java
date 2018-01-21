@@ -121,7 +121,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)) {
-                    startActivity(new Intent(LoginActivity.this, UserListActivity.class));
+                    startActivity(new Intent(LoginActivity.this, TabActivity.class));
                     Utils.savePref("userName", value);
                     Toast.makeText(LoginActivity.this, "successfully login", Toast.LENGTH_SHORT).show();
                     finish();
