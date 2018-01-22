@@ -59,7 +59,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by ASUS on 1/22/2018.
  */
 
-public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class FriendsFragment extends Fragment {
+    //comment on for face prob
+//        implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView recyclerListFrends;
     private ListFriendsAdapter adapter;
@@ -67,11 +69,12 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     private ListFriend dataListFriend = null;
     private ArrayList<String> listFriendID = null;
     private LovelyProgressDialog dialogFindAllFriend;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    //comment on for face prob
+    //    private SwipeRefreshLayout mSwipeRefreshLayout;
     private CountDownTimer detectFriendOnline;
     public static int ACTION_START_CHAT = 1;
 
-    public static final String ACTION_DELETE_FRIEND = "com.android.rivchat.DELETE_FRIEND";
+    public static final String ACTION_DELETE_FRIEND = "com.example.dev.chatapplication.DELETE_FRIEND";
 
     private BroadcastReceiver deleteFriendReceiver;
 
@@ -99,41 +102,59 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             }
         };
-        if (dataListFriend == null) {
+
+        //both code will remove when under code comment off
+        if (dataListFriend == null){
+            dataListFriend = new ListFriend();
             dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
-            if (dataListFriend.getListFriend().size() > 0) {
-                listFriendID = new ArrayList<>();
-                for (Friend friend : dataListFriend.getListFriend()) {
-                    listFriendID.add(friend.id);
-                }
-                detectFriendOnline.start();
-            }
         }
+
+        //comment on for face prob
+//        if (dataListFriend == null) {
+//
+//            dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
+//            if (dataListFriend.getListFriend().size() > 0) {
+//                listFriendID = new ArrayList<>();
+//                for (Friend friend : dataListFriend.getListFriend()) {
+//                    listFriendID.add(friend.id);
+//                }
+//                detectFriendOnline.start();
+//            }
+//        }
         View layout = inflater.inflate(R.layout.fragment_people, container, false);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerListFrends = (RecyclerView) layout.findViewById(R.id.recycleListFriend);
         recyclerListFrends.setLayoutManager(linearLayoutManager);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipeRefreshLayout);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        //comment on for face prob
+//        mSwipeRefreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipeRefreshLayout);
+//        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         adapter = new ListFriendsAdapter(getContext(), dataListFriend, this);
         recyclerListFrends.setAdapter(adapter);
         dialogFindAllFriend = new LovelyProgressDialog(getContext());
-        if (listFriendID == null) {
+
+        //both code will remove when under code comment off
+        if (listFriendID == null)
             listFriendID = new ArrayList<>();
-            dialogFindAllFriend.setCancelable(false)
-                    .setIcon(R.drawable.ic_add_friend)
-                    .setTitle("Get all friend....")
-                    .setTopColorRes(R.color.colorPrimary)
-                    .show();
-            getListFriendUId();
-        }
+
+
+        //comment on for face prob
+//        if (listFriendID == null) {
+//            listFriendID = new ArrayList<>();
+//            dialogFindAllFriend.setCancelable(false)
+//                    .setIcon(R.drawable.ic_add_friend)
+//                    .setTitle("Get all friend....")
+//                    .setTopColorRes(R.color.colorPrimary)
+//                    .show();
+////            getListFriendUId();
+//        }
 
         deleteFriendReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String idDeleted = intent.getExtras().getString("idFriend");
                 for (Friend friend : dataListFriend.getListFriend()) {
-                    if(idDeleted.equals(friend.id)){
+                    if (idDeleted.equals(friend.id)) {
                         ArrayList<Friend> friends = dataListFriend.getListFriend();
                         friends.remove(friend);
                         break;
@@ -150,7 +171,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     @Override
-    public void onDestroyView (){
+    public void onDestroyView() {
         super.onDestroyView();
 
         getContext().unregisterReceiver(deleteFriendReceiver);
@@ -163,16 +184,16 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             ListFriendsAdapter.mapMark.put(data.getStringExtra("idFriend"), false);
         }
     }
-
-    @Override
-    public void onRefresh() {
-        listFriendID.clear();
-        dataListFriend.getListFriend().clear();
-        adapter.notifyDataSetChanged();
-        FriendDB.getInstance(getContext()).dropDB();
-        detectFriendOnline.cancel();
-        getListFriendUId();
-    }
+    //comment on for face prob
+//    @Override
+//    public void onRefresh() {
+////        listFriendID.clear();
+////        dataListFriend.getListFriend().clear();
+////        adapter.notifyDataSetChanged();
+//////        FriendDB.getInstance(getContext()).dropDB();
+////        detectFriendOnline.cancel();
+////        getListFriendUId();
+//    }
 
     public class FragFriendClickFloatButton implements View.OnClickListener {
         Context context;
@@ -209,18 +230,11 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         public void onTextInputConfirmed(String text) {
                             //Tim id user id
                             findIDEmail(text);
-                            //Check xem da ton tai ban ghi friend chua
-                            //Ghi them 1 ban ghi
                         }
                     })
                     .show();
         }
 
-        /**
-         * TIm id cua email tren server
-         *
-         * @param email
-         */
         private void findIDEmail(String email) {
             dialogWait.setCancelable(false)
                     .setIcon(R.drawable.ic_add_friend)
@@ -268,9 +282,6 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
             });
         }
 
-        /**
-         * Lay danh sach friend cua một UID
-         */
         private void checkBeforAddFriend(final String idFriend, Friend userInfo) {
             dialogWait.setCancelable(false)
                     .setIcon(R.drawable.ic_add_friend)
@@ -278,14 +289,13 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                     .setTopColorRes(R.color.colorPrimary)
                     .show();
 
-            //Check xem da ton tai id trong danh sach id chua
             if (listFriendID.contains(idFriend)) {
                 dialogWait.dismiss();
                 new LovelyInfoDialog(context)
                         .setTopColorRes(R.color.colorPrimary)
                         .setIcon(R.drawable.ic_add_friend)
                         .setTitle("Friend")
-                        .setMessage("User "+userInfo.email + " has been friend")
+                        .setMessage("User " + userInfo.email + " has been friend")
                         .show();
             } else {
                 addFriend(idFriend, true);
@@ -361,9 +371,6 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    /**
-     * Lay danh sach ban be tren server
-     */
     private void getListFriendUId() {
         FirebaseDatabase.getInstance().getReference().child("friend/" + StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -387,15 +394,12 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
         });
     }
 
-    /**
-     * Truy cap bang user lay thong tin id nguoi dung
-     */
     private void getAllFriendInfo(final int index) {
         if (index == listFriendID.size()) {
             //save list friend
             adapter.notifyDataSetChanged();
             dialogFindAllFriend.dismiss();
-            mSwipeRefreshLayout.setRefreshing(false);
+//            mSwipeRefreshLayout.setRefreshing(false);
             detectFriendOnline.start();
         } else {
             final String id = listFriendID.get(index);
@@ -411,7 +415,7 @@ public class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         user.id = id;
                         user.idRoom = id.compareTo(StaticConfig.UID) > 0 ? (StaticConfig.UID + id).hashCode() + "" : "" + (id + StaticConfig.UID).hashCode();
                         dataListFriend.getListFriend().add(user);
-                        FriendDB.getInstance(getContext()).addFriend(user);
+//                        FriendDB.getInstance(getContext()).addFriend(user);
                     }
                     getAllFriendInfo(index + 1);
                 }
@@ -480,7 +484,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             byte[] decodedString = Base64.decode(avata, Base64.DEFAULT);
                             ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
                         } else {
-                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
+                            ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.friend));
                         }
 
                         mapMark.put(id, null);
@@ -488,16 +492,15 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
 
-        //nhấn giữ để xóa bạn
         ((View) ((ItemFriendViewHolder) holder).txtName.getParent().getParent().getParent())
                 .setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        String friendName = (String)((ItemFriendViewHolder) holder).txtName.getText();
+                        String friendName = (String) ((ItemFriendViewHolder) holder).txtName.getText();
 
                         new AlertDialog.Builder(context)
                                 .setTitle("Delete Friend")
-                                .setMessage("Are you sure want to delete "+friendName+ "?")
+                                .setMessage("Are you sure want to delete " + friendName + "?")
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -594,7 +597,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
         if (listFriend.getListFriend().get(position).avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-            ((ItemFriendViewHolder) holder).avata.setImageResource(R.drawable.default_avata);
+            ((ItemFriendViewHolder) holder).avata.setImageResource(R.drawable.friend);
         } else {
             byte[] decodedString = Base64.decode(listFriend.getListFriend().get(position).avata, Base64.DEFAULT);
             Bitmap src = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -603,22 +606,22 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
         if (mapQueryOnline.get(id) == null && mapChildListenerOnline.get(id) == null) {
-            mapQueryOnline.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id+"/status"));
+            mapQueryOnline.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/status"));
             mapChildListenerOnline.put(id, new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if(dataSnapshot.getValue() != null && dataSnapshot.getKey().equals("isOnline")) {
-                        Log.d("FriendsFragment add " + id,  (boolean)dataSnapshot.getValue() +"");
-                        listFriend.getListFriend().get(position).status.isOnline = (boolean)dataSnapshot.getValue();
+                    if (dataSnapshot.getValue() != null && dataSnapshot.getKey().equals("isOnline")) {
+                        Log.d("FriendsFragment add " + id, (boolean) dataSnapshot.getValue() + "");
+                        listFriend.getListFriend().get(position).status.isOnline = (boolean) dataSnapshot.getValue();
                         notifyDataSetChanged();
                     }
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    if(dataSnapshot.getValue() != null&& dataSnapshot.getKey().equals("isOnline")) {
-                        Log.d("FriendsFragment change " + id,  (boolean)dataSnapshot.getValue() +"");
-                        listFriend.getListFriend().get(position).status.isOnline = (boolean)dataSnapshot.getValue();
+                    if (dataSnapshot.getValue() != null && dataSnapshot.getKey().equals("isOnline")) {
+                        Log.d("FriendsFragment change " + id, (boolean) dataSnapshot.getValue() + "");
+                        listFriend.getListFriend().get(position).status.isOnline = (boolean) dataSnapshot.getValue();
                         notifyDataSetChanged();
                     }
                 }
@@ -723,7 +726,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 }
 
-class ItemFriendViewHolder extends RecyclerView.ViewHolder{
+class ItemFriendViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView avata;
     public TextView txtName, txtTime, txtMessage;
     private Context context;

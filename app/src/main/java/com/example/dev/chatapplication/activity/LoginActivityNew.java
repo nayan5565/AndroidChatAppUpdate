@@ -71,11 +71,7 @@ public class LoginActivityNew extends AppCompatActivity {
     }
 
 
-    /**
-     * Khởi tạo các thành phần cần thiết cho việc quản lý đăng nhập
-     */
     private void initFirebase() {
-        //Khoi tao thanh phan de dang nhap, dang ky
         mAuth = FirebaseAuth.getInstance();
         authUtils = new AuthUtils();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -97,7 +93,6 @@ public class LoginActivityNew extends AppCompatActivity {
             }
         };
 
-        //Khoi tao dialog waiting khi dang nhap
         waitingDialog = new LovelyProgressDialog(this).setCancelable(false);
     }
 
@@ -336,9 +331,6 @@ public class LoginActivityNew extends AppCompatActivity {
                     });
         }
 
-        /**
-         * Luu thong tin user info cho nguoi dung dang nhap
-         */
         void saveUserInfo() {
             FirebaseDatabase.getInstance().getReference().child("user/" + StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -359,9 +351,6 @@ public class LoginActivityNew extends AppCompatActivity {
             });
         }
 
-        /**
-         * Khoi tao thong tin mac dinh cho tai khoan moi
-         */
         void initNewUserInfo() {
             User newUser = new User();
             newUser.email = user.getEmail();
