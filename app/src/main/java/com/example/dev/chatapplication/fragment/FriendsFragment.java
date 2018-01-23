@@ -29,6 +29,7 @@ import com.example.dev.chatapplication.activity.ChatActivity;
 import com.example.dev.chatapplication.data.FriendDB;
 import com.example.dev.chatapplication.model.Friend;
 import com.example.dev.chatapplication.model.ListFriend;
+import com.example.dev.chatapplication.service.ServiceUtils;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -60,7 +61,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class FriendsFragment extends Fragment {
-    //comment on for face prob
 //        implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView recyclerListFrends;
@@ -70,7 +70,7 @@ public class FriendsFragment extends Fragment {
     private ArrayList<String> listFriendID = null;
     private LovelyProgressDialog dialogFindAllFriend;
     //comment on for face prob
-    //    private SwipeRefreshLayout mSwipeRefreshLayout;
+//    private SwipeRefreshLayout mSwipeRefreshLayout;
     private CountDownTimer detectFriendOnline;
     public static int ACTION_START_CHAT = 1;
 
@@ -93,8 +93,8 @@ public class FriendsFragment extends Fragment {
         detectFriendOnline = new CountDownTimer(System.currentTimeMillis(), StaticConfig.TIME_TO_REFRESH) {
             @Override
             public void onTick(long l) {
-//                ServiceUtils.updateFriendStatus(getContext(), dataListFriend);
-//                ServiceUtils.updateUserStatus(getContext());
+                ServiceUtils.updateFriendStatus(getContext(), dataListFriend);
+                ServiceUtils.updateUserStatus(getContext());
             }
 
             @Override
@@ -102,25 +102,26 @@ public class FriendsFragment extends Fragment {
 
             }
         };
-
         //both code will remove when under code comment off
-        if (dataListFriend == null){
-            dataListFriend = new ListFriend();
-            dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
-        }
+//        if (dataListFriend == null){
+//            dataListFriend = new ListFriend();
+//            dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
+//            Log.e("listFriend"," is "+dataListFriend);
+//        }
 
         //comment on for face prob
-//        if (dataListFriend == null) {
-//
-//            dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
-//            if (dataListFriend.getListFriend().size() > 0) {
-//                listFriendID = new ArrayList<>();
-//                for (Friend friend : dataListFriend.getListFriend()) {
-//                    listFriendID.add(friend.id);
-//                }
-//                detectFriendOnline.start();
-//            }
-//        }
+        if (dataListFriend == null) {
+
+            dataListFriend = FriendDB.getInstance(getContext()).getListFriend();
+            if (dataListFriend.getListFriend().size() > 0) {
+                listFriendID = new ArrayList<>();
+                for (Friend friend : dataListFriend.getListFriend()) {
+                    listFriendID.add(friend.id);
+                }
+
+                detectFriendOnline.start();
+            }
+        }
         View layout = inflater.inflate(R.layout.fragment_people, container, false);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerListFrends = (RecyclerView) layout.findViewById(R.id.recycleListFriend);
@@ -184,14 +185,18 @@ public class FriendsFragment extends Fragment {
             ListFriendsAdapter.mapMark.put(data.getStringExtra("idFriend"), false);
         }
     }
+
     //comment on for face prob
 //    @Override
 //    public void onRefresh() {
-////        listFriendID.clear();
+//        listFriendID.clear();
 ////        dataListFriend.getListFriend().clear();
-////        adapter.notifyDataSetChanged();
+//
+//        adapter.notifyDataSetChanged();
 //////        FriendDB.getInstance(getContext()).dropDB();
 ////        detectFriendOnline.cancel();
+//        if (listFriendID.size() == 0)
+//            mSwipeRefreshLayout.setRefreshing(false);
 ////        getListFriendUId();
 //    }
 
@@ -611,7 +616,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.getValue() != null && dataSnapshot.getKey().equals("isOnline")) {
-                        Log.d("FriendsFragment add " + id, (boolean) dataSnapshot.getValue() + "");
+                        Log.e("FriendsFragment add " + id, (boolean) dataSnapshot.getValue() + "");
                         listFriend.getListFriend().get(position).status.isOnline = (boolean) dataSnapshot.getValue();
                         notifyDataSetChanged();
                     }
@@ -620,7 +625,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.getValue() != null && dataSnapshot.getKey().equals("isOnline")) {
-                        Log.d("FriendsFragment change " + id, (boolean) dataSnapshot.getValue() + "");
+                        Log.e("FriendsFragment change " + id, (boolean) dataSnapshot.getValue() + "");
                         listFriend.getListFriend().get(position).status.isOnline = (boolean) dataSnapshot.getValue();
                         notifyDataSetChanged();
                     }
@@ -628,17 +633,16 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    Log.e("FriendsFragment Remove " + id, (boolean) dataSnapshot.getValue() + "");
                 }
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                    Log.e("FriendsFragment Moved " + id, (boolean) dataSnapshot.getValue() + "");
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
             mapQueryOnline.get(id).addChildEventListener(mapChildListenerOnline.get(id));

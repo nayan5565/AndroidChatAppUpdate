@@ -81,7 +81,7 @@ public class LoginActivityNew extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     StaticConfig.UID = user.getUid();
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.e(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     if (firstTimeAccess) {
                         startActivity(new Intent(LoginActivityNew.this, TabActivity.class));
                         LoginActivityNew.this.finish();
@@ -158,9 +158,6 @@ public class LoginActivityNew extends AppCompatActivity {
         }
     }
 
-    /**
-     * Dinh nghia cac ham tien ich cho quas trinhf dang nhap, dang ky,...
-     */
     class AuthUtils {
         /**
          * Action register

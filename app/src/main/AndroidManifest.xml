@@ -28,6 +28,11 @@
             android:name=".activity.LoginActivityNew"
             android:theme="@style/TranslucentBackground" />
         <activity android:name=".activity.ChatActivity" />
+
+        <service
+            android:name=".service.FriendChatService"
+            android:exported="false"
+            android:persistent="true" />
     </application>
 
 </manifest>

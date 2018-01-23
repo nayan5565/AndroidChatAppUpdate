@@ -21,7 +21,9 @@ import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.fragment.FriendsFragment;
 import com.example.dev.chatapplication.fragment.GroupFragment;
 import com.example.dev.chatapplication.fragment.UserProfileFragment;
+import com.example.dev.chatapplication.service.ServiceUtils;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -47,17 +49,13 @@ public class TabActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
+    private Status status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_activity);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        if(toolbar != null) {
-//            setSupportActionBar(toolbar);
-//            getSupportActionBar().setTitle("RivChat");
-//        }
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
@@ -66,7 +64,7 @@ public class TabActivity extends AppCompatActivity {
     }
 
     private void initFirebase() {
-        //Khoi tao thanh phan de dang nhap, dang ky
+        status = new Status();
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -74,6 +72,7 @@ public class TabActivity extends AppCompatActivity {
                 user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     StaticConfig.UID = user.getUid();
+
                 } else {
                     TabActivity.this.finish();
                     // User is signed in
@@ -90,7 +89,7 @@ public class TabActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
-//        ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
+        ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
     }
 
     @Override
@@ -103,13 +102,10 @@ public class TabActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-//        ServiceUtils.startServiceFriendChat(getApplicationContext());
+        ServiceUtils.startServiceFriendChat(getApplicationContext());
         super.onDestroy();
     }
 
-    /**
-     * Khoi tao 3 tab
-     */
     private void initTab() {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorIndivateTab));
@@ -147,7 +143,7 @@ public class TabActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-//                ServiceUtils.stopServiceFriendChat(TabActivity.this.getApplicationContext(), false);
+                ServiceUtils.stopServiceFriendChat(TabActivity.this.getApplicationContext(), false);
                 if (adapter.getItem(position) instanceof FriendsFragment) {
                     floatButton.setVisibility(View.VISIBLE);
                     floatButton.setOnClickListener(((FriendsFragment) adapter.getItem(position)).onClickFloatButton.getInstance(TabActivity.this));
@@ -208,9 +204,6 @@ public class TabActivity extends AppCompatActivity {
 //        return super.onOptionsItemSelected(item);
 //    }
 
-    /**
-     * Adapter hien thi tab
-     */
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
