@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,14 +53,14 @@ public class RegistrationActvityNew extends AppCompatActivity {
             public void onClick(View v) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     animateRevealClose();
-                }
-                else {
+                } else {
                     RegistrationActvityNew.super.onBackPressed();
                 }
 
             }
         });
     }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void ShowEnterAnimation() {
         Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.fabtransition);
@@ -98,7 +99,7 @@ public class RegistrationActvityNew extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void animateRevealShow() {
-        Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd, cvAdd.getWidth()/2,0, fab.getWidth() / 2, cvAdd.getHeight());
+        Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd, cvAdd.getWidth() / 2, 0, fab.getWidth() / 2, cvAdd.getHeight());
         mAnimator.setDuration(500);
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.addListener(new AnimatorListenerAdapter() {
@@ -118,7 +119,7 @@ public class RegistrationActvityNew extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void animateRevealClose() {
-        Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd,cvAdd.getWidth()/2,0, cvAdd.getHeight(), fab.getWidth() / 2);
+        Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd, cvAdd.getWidth() / 2, 0, cvAdd.getHeight(), fab.getWidth() / 2);
         mAnimator.setDuration(500);
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.addListener(new AnimatorListenerAdapter() {
@@ -137,12 +138,12 @@ public class RegistrationActvityNew extends AppCompatActivity {
         });
         mAnimator.start();
     }
+
     @Override
     public void onBackPressed() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             animateRevealClose();
-        }
-        else {
+        } else {
             RegistrationActvityNew.super.onBackPressed();
         }
     }
@@ -151,26 +152,28 @@ public class RegistrationActvityNew extends AppCompatActivity {
         String username = editTextUsername.getText().toString();
         String password = editTextPassword.getText().toString();
         String repeatPassword = editTextRepeatPassword.getText().toString();
-        if(validate(username, password, repeatPassword)){
+        if (validate(username, password, repeatPassword)) {
+            Utils.savePref("UserEmail", username);
             Intent data = new Intent();
             data.putExtra(StaticConfig.STR_EXTRA_USERNAME, username);
             data.putExtra(StaticConfig.STR_EXTRA_PASSWORD, password);
             data.putExtra(StaticConfig.STR_EXTRA_ACTION, STR_EXTRA_ACTION_REGISTER);
             setResult(RESULT_OK, data);
             finish();
-        }else {
+        } else {
             Toast.makeText(this, "Invalid email or not match password", Toast.LENGTH_SHORT).show();
         }
     }
 
     /**
      * Validate email, pass == re_pass
+     *
      * @param emailStr
      * @param password
      * @return
      */
     private boolean validate(String emailStr, String password, String repeatPassword) {
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
         return password.length() > 0 && repeatPassword.equals(password) && matcher.find();
     }
 }

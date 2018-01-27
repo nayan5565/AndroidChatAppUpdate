@@ -1,5 +1,7 @@
 package com.example.dev.chatapplication.fragment;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,11 +29,15 @@ import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.activity.ChatActivity;
+import com.example.dev.chatapplication.activity.MainActivity;
+import com.example.dev.chatapplication.activity.TabActivity;
 import com.example.dev.chatapplication.data.FriendDB;
 import com.example.dev.chatapplication.model.Friend;
 import com.example.dev.chatapplication.model.ListFriend;
 import com.example.dev.chatapplication.service.ServiceUtils;
+import com.example.dev.chatapplication.tools.MainApplication;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -55,6 +62,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by ASUS on 1/22/2018.
@@ -240,6 +249,28 @@ public class FriendsFragment extends Fragment {
                     .show();
         }
 
+        public void sendNotification() {
+            String emaii = Utils.getPref("UserEmail", "user");
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(MainApplication.getInstance().getContext());
+            builder.setSmallIcon(R.drawable.default_avata);
+            Intent intent = new Intent(MainApplication.getInstance().getContext(), TabActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(MainApplication.getInstance().getContext(), 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+            builder.setContentIntent(pendingIntent);
+//        builder.setDefaults(Notification.DEFAULT_SOUND);
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.default_avata));
+            builder.setContentTitle(emaii);
+            builder.setAutoCancel(true);
+//        builder.setContentText("Your notification content here.");
+//        builder.setSubText("Tap to view the website.");
+
+            NotificationManager notificationManager = (NotificationManager) MainApplication.getInstance().getContext().getSystemService(NOTIFICATION_SERVICE);
+
+            // Will display the notification in the notification bar
+            notificationManager.notify(1, builder.build());
+        }
+
         private void findIDEmail(String email) {
             dialogWait.setCancelable(false)
                     .setIcon(R.drawable.ic_add_friend)
@@ -303,6 +334,8 @@ public class FriendsFragment extends Fragment {
                         .setMessage("User " + userInfo.email + " has been friend")
                         .show();
             } else {
+                // trying send notificatation when added freiend list
+                sendNotification();
                 addFriend(idFriend, true);
                 listFriendID.add(idFriend);
                 dataListFriend.getListFriend().add(userInfo);

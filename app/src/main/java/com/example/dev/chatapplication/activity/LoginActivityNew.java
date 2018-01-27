@@ -18,6 +18,7 @@ import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.model.User;
 import com.example.dev.chatapplication.tools.SharedPreferenceHelper;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -52,6 +53,7 @@ public class LoginActivityNew extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser user;
     private boolean firstTimeAccess;
+    private String userEmail;
 
     @Override
     protected void onStart() {
@@ -128,6 +130,7 @@ public class LoginActivityNew extends AppCompatActivity {
     }
 
     public void clickLogin(View view) {
+        userEmail = Utils.getPref("UserEmail", "user");
         String username = editTextUsername.getText().toString();
         String password = editTextPassword.getText().toString();
         if (validate(username, password)) {
@@ -223,7 +226,7 @@ public class LoginActivityNew extends AppCompatActivity {
          * @param email
          * @param password
          */
-        void signIn(String email, String password) {
+        void signIn(final String email, String password) {
             waitingDialog.setIcon(R.drawable.ic_person_low)
                     .setTitle("Login....")
                     .setTopColorRes(R.color.colorPrimary)
@@ -260,6 +263,8 @@ public class LoginActivityNew extends AppCompatActivity {
                                         .show();
                             } else {
                                 saveUserInfo();
+                                if (userEmail.equals("user"))
+                                    Utils.getPref("UserEmail", email);
                                 startActivity(new Intent(LoginActivityNew.this, TabActivity.class));
                                 LoginActivityNew.this.finish();
                             }
