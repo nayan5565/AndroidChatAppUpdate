@@ -26,7 +26,7 @@
         android:layout_toStartOf="@id/imageView2"
         android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#ffffff" />
+        android:textColor="#000000" />
 
     <ImageView
         android:id="@+id/imgShare"

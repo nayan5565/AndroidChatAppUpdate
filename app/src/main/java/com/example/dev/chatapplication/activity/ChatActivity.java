@@ -1,13 +1,17 @@
 package com.example.dev.chatapplication.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +32,7 @@ import com.example.dev.chatapplication.model.Consersation;
 import com.example.dev.chatapplication.model.Message2;
 import com.example.dev.chatapplication.tools.SharedPreferenceHelper;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Utils;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +67,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnShare;
     public static String imgPath;
     private ImageView imgSelect;
+    public static String temp;
+    private static final int STORAGE_PERMISSION_CODE = 23;
 
 
     @Override
@@ -138,6 +146,38 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void requestStoragePermissionToMashmallow() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            //If the user has denied the permission previously your code will come to this block
+            //Here you can explain why you need this permission
+            //Explain here why you need this permission
+        }
+
+        //And finally ask for the permission
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Checking the request code of our request
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+
+            //If permission is granted
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                startActivityForResult(galleryIntent, 1);
+                //Displaying a toast
+//                Utils.toastMassage(this, "Permission granted now you can read the storage");
+            } else {
+                //Displaying another toast if permission is not granted
+//                Utils.toastMassage(this, "Oops you just denied the permission");
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -165,7 +205,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         imgPath = cursor.getString(columnIndex);
         File imageFile = new File(imgPath);
         imgSelect.setVisibility(View.VISIBLE);
-        imgSelect.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+        Bitmap bmp=BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+        imgSelect.setImageBitmap(bmp);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        temp = Base64.encodeToString(b, Base64.DEFAULT);
 //        Toast.makeText(ChatActivity.this, imgPath, Toast.LENGTH_SHORT).show();
         cursor.close();
     }
@@ -183,23 +228,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId() == R.id.btnSend) {
             String content = editWriteMessage.getText().toString().trim();
 
-            if (content.length() > 0 || imgPath != null) {
+            if (content.length() > 0 || temp != null) {
                 editWriteMessage.setText("");
                 imgSelect.setVisibility(View.GONE);
                 Message2 newMessage = new Message2();
                 newMessage.text = content;
-                newMessage.image = imgPath;
+                newMessage.image = temp;
                 newMessage.idSender = StaticConfig.UID;
                 newMessage.idReceiver = roomId;
                 newMessage.timestamp = System.currentTimeMillis();
                 FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
-                imgPath = null;
+                temp = null;
             }
         } else if (view.getId() == R.id.btnShare) {
-            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            requestStoragePermissionToMashmallow();
 
-            startActivityForResult(galleryIntent, 1);
         }
     }
 }
@@ -235,7 +278,8 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemMessageFriendHolder) {
-            ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeFile(consersation.getListMessageData().get(position).image));
+            byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+            ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString,0, decodedString.length));
             ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
             Bitmap currentAvata = bitmapAvata.get(consersation.getListMessageData().get(position).idSender);
             if (currentAvata != null) {
@@ -267,11 +311,13 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
         } else if (holder instanceof ItemMessageUserHolder) {
+            byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+            ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString,0, decodedString.length));
             ((ItemMessageUserHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
             if (bitmapAvataUser != null) {
                 ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
             }
-            ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeFile(consersation.getListMessageData().get(position).image));
+
 
         }
     }
