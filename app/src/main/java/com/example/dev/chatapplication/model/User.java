@@ -22,6 +22,7 @@ public class User {
         message.idReceiver = "0";
         message.idSender = "0";
         message.text = "";
+        message.image = "";
         message.timestamp = 0;
     }
 }

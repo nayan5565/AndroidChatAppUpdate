@@ -2,9 +2,12 @@ package com.example.dev.chatapplication.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +16,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.model.Consersation;
@@ -29,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -51,12 +58,21 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayoutManager linearLayoutManager;
     public static HashMap<String, Bitmap> bitmapAvataFriend;
     public Bitmap bitmapAvataUser;
+    private Button btnShare;
+    public static String imgPath;
+    private ImageView imgSelect;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        btnShare = (Button) findViewById(R.id.btnShare);
+        imgSelect = (ImageView) findViewById(R.id.imgSelect);
+//        if (imgPath != null) {
+//            imgSelect.setBackgroundResource(Integer.parseInt(imgPath));
+//        }
+        btnShare.setOnClickListener(this);
         Intent intentData = getIntent();
         idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
@@ -90,6 +106,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         newMessage.idSender = (String) mapMessage.get("idSender");
                         newMessage.idReceiver = (String) mapMessage.get("idReceiver");
                         newMessage.text = (String) mapMessage.get("text");
+                        newMessage.image = (String) mapMessage.get("image");
                         newMessage.timestamp = (long) mapMessage.get("timestamp");
                         consersation.getListMessageData().add(newMessage);
                         adapter.notifyDataSetChanged();
@@ -123,13 +140,34 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             Intent result = new Intent();
             result.putExtra("idFriend", idFriend.get(0));
             setResult(RESULT_OK, result);
             this.finish();
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri selectedImage = data.getData();
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+
+        Cursor cursor = getContentResolver().query(selectedImage,
+                filePathColumn, null, null, null);
+
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        imgPath = cursor.getString(columnIndex);
+        File imageFile = new File(imgPath);
+        imgSelect.setVisibility(View.VISIBLE);
+        imgSelect.setImageBitmap(BitmapFactory.decodeFile(imgPath));
+//        Toast.makeText(ChatActivity.this, imgPath, Toast.LENGTH_SHORT).show();
+        cursor.close();
     }
 
     @Override
@@ -144,15 +182,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         if (view.getId() == R.id.btnSend) {
             String content = editWriteMessage.getText().toString().trim();
-            if (content.length() > 0) {
+
+            if (content.length() > 0 || imgPath != null) {
                 editWriteMessage.setText("");
+                imgSelect.setVisibility(View.GONE);
                 Message2 newMessage = new Message2();
                 newMessage.text = content;
+                newMessage.image = imgPath;
                 newMessage.idSender = StaticConfig.UID;
                 newMessage.idReceiver = roomId;
                 newMessage.timestamp = System.currentTimeMillis();
                 FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
+                imgPath = null;
             }
+        } else if (view.getId() == R.id.btnShare) {
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            startActivityForResult(galleryIntent, 1);
         }
     }
 }
@@ -188,23 +235,24 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemMessageFriendHolder) {
+            ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeFile(consersation.getListMessageData().get(position).image));
             ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
             Bitmap currentAvata = bitmapAvata.get(consersation.getListMessageData().get(position).idSender);
             if (currentAvata != null) {
                 ((ItemMessageFriendHolder) holder).avata.setImageBitmap(currentAvata);
             } else {
                 final String id = consersation.getListMessageData().get(position).idSender;
-                if(bitmapAvataDB.get(id) == null){
+                if (bitmapAvataDB.get(id) == null) {
                     bitmapAvataDB.put(id, FirebaseDatabase.getInstance().getReference().child("user/" + id + "/avata"));
                     bitmapAvataDB.get(id).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.getValue() != null) {
                                 String avataStr = (String) dataSnapshot.getValue();
-                                if(!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                                if (!avataStr.equals(StaticConfig.STR_DEFAULT_BASE64)) {
                                     byte[] decodedString = Base64.decode(avataStr, Base64.DEFAULT);
                                     ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                                }else{
+                                } else {
                                     ChatActivity.bitmapAvataFriend.put(id, BitmapFactory.decodeResource(context.getResources(), R.drawable.default_avata));
                                 }
                                 notifyDataSetChanged();
@@ -223,6 +271,8 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (bitmapAvataUser != null) {
                 ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
             }
+            ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeFile(consersation.getListMessageData().get(position).image));
+
         }
     }
 
@@ -240,9 +290,11 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 class ItemMessageUserHolder extends RecyclerView.ViewHolder {
     public TextView txtContent;
     public CircleImageView avata;
+    public ImageView imgShare;
 
     public ItemMessageUserHolder(View itemView) {
         super(itemView);
+        imgShare = (ImageView) itemView.findViewById(R.id.imgShare);
         txtContent = (TextView) itemView.findViewById(R.id.textContentUser);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView2);
     }
@@ -251,9 +303,11 @@ class ItemMessageUserHolder extends RecyclerView.ViewHolder {
 class ItemMessageFriendHolder extends RecyclerView.ViewHolder {
     public TextView txtContent;
     public CircleImageView avata;
+    public ImageView imgShare;
 
     public ItemMessageFriendHolder(View itemView) {
         super(itemView);
+        imgShare = (ImageView) itemView.findViewById(R.id.imgShareFriend);
         txtContent = (TextView) itemView.findViewById(R.id.textContentFriend);
         avata = (CircleImageView) itemView.findViewById(R.id.imageView3);
     }

@@ -8,5 +8,6 @@ public class Message2 {
     public String idSender;
     public String idReceiver;
     public String text;
+    public String image;
     public long timestamp;
 }

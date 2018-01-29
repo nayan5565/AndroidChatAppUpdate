@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
@@ -526,7 +527,8 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         }
 
                         mapMark.put(id, null);
-                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
+                        context.startActivity(intent);
+//                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
                     }
                 });
 
@@ -563,15 +565,18 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
 
 
-        if (listFriend.getListFriend().get(position).message.text.length() > 0) {
+        if (listFriend.getListFriend().get(position).message.text.length() > 0 || listFriend.getListFriend().get(position).message.image.length() > 0) {
             ((ItemFriendViewHolder) holder).txtMessage.setVisibility(View.VISIBLE);
+            ((ItemFriendViewHolder) holder).img.setVisibility(View.VISIBLE);
             ((ItemFriendViewHolder) holder).txtTime.setVisibility(View.VISIBLE);
-            if (!listFriend.getListFriend().get(position).message.text.startsWith(id)) {
+            if (!listFriend.getListFriend().get(position).message.text.startsWith(id) || !listFriend.getListFriend().get(position).message.image.startsWith(id)) {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text);
+                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeFile(listFriend.getListFriend().get(position).message.image));
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
             } else {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
+                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeFile(listFriend.getListFriend().get(position).message.image.substring((id + "").length())));
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
             }
@@ -584,6 +589,7 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         } else {
             ((ItemFriendViewHolder) holder).txtMessage.setVisibility(View.GONE);
+            ((ItemFriendViewHolder) holder).img.setVisibility(View.GONE);
             ((ItemFriendViewHolder) holder).txtTime.setVisibility(View.GONE);
             if (mapQuery.get(id) == null && mapChildListener.get(id) == null) {
                 mapQuery.put(id, FirebaseDatabase.getInstance().getReference().child("message/" + idRoom).limitToLast(1));
@@ -594,13 +600,16 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         if (mapMark.get(id) != null) {
                             if (!mapMark.get(id)) {
                                 listFriend.getListFriend().get(position).message.text = id + mapMessage.get("text");
+                                listFriend.getListFriend().get(position).message.image = id + mapMessage.get("image");
                             } else {
                                 listFriend.getListFriend().get(position).message.text = (String) mapMessage.get("text");
+                                listFriend.getListFriend().get(position).message.image = (String) mapMessage.get("image");
                             }
                             notifyDataSetChanged();
                             mapMark.put(id, false);
                         } else {
                             listFriend.getListFriend().get(position).message.text = (String) mapMessage.get("text");
+                            listFriend.getListFriend().get(position).message.image = (String) mapMessage.get("image");
                             notifyDataSetChanged();
                         }
                         listFriend.getListFriend().get(position).message.timestamp = (long) mapMessage.get("timestamp");
@@ -766,10 +775,12 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 class ItemFriendViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView avata;
     public TextView txtName, txtTime, txtMessage;
+    public ImageView img;
     private Context context;
 
     ItemFriendViewHolder(Context context, View itemView) {
         super(itemView);
+        img = (ImageView) itemView.findViewById(R.id.img);
         avata = (CircleImageView) itemView.findViewById(R.id.icon_avata);
         txtName = (TextView) itemView.findViewById(R.id.txtName);
         txtTime = (TextView) itemView.findViewById(R.id.txtTime);

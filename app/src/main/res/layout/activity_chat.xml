@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorIndivateTab">
+    android:background="@color/colorIndivateTab"
+    android:orientation="vertical">
 
 
     <ImageButton
@@ -11,24 +11,34 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_toStartOf="@id/btnShare"
         android:background="#00000000"
         android:padding="10dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_send" />
 
-    <View
-        android:id="@+id/line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/grey_200"
-        android:layout_above="@id/btnSend"/>
+
+    <Button
+        android:id="@+id/btnShare"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:padding="10dp"
+        android:scaleType="centerInside" />
+
+    <!--<View-->
+        <!--android:id="@+id/line"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:layout_above="@id/btnSend"-->
+        <!--android:background="@color/grey_200" />-->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerChat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/line">
+        android:layout_above="@id/editWriteMessage">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -49,5 +59,14 @@
         android:paddingRight="7dp"
         android:textColorHint="#aeafaf"
         android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/imgSelect"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@id/btnSend"
+        android:scaleType="centerCrop" />
+
 
 </RelativeLayout>
