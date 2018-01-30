@@ -527,8 +527,8 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         }
 
                         mapMark.put(id, null);
-                        context.startActivity(intent);
-//                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
+//                        context.startActivity(intent);
+                        fragment.startActivityForResult(intent, FriendsFragment.ACTION_START_CHAT);
                     }
                 });
 
@@ -565,18 +565,20 @@ class ListFriendsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
 
 
-        if (listFriend.getListFriend().get(position).message.text.length() > 0 || listFriend.getListFriend().get(position).message.image.length() > 0) {
+        if (listFriend.getListFriend().get(position).message.text.length() > 0 || listFriend.getListFriend().get(position).message.image!=null) {
             ((ItemFriendViewHolder) holder).txtMessage.setVisibility(View.VISIBLE);
             ((ItemFriendViewHolder) holder).img.setVisibility(View.VISIBLE);
             ((ItemFriendViewHolder) holder).txtTime.setVisibility(View.VISIBLE);
             if (!listFriend.getListFriend().get(position).message.text.startsWith(id) || !listFriend.getListFriend().get(position).message.image.startsWith(id)) {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text);
-                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeFile(listFriend.getListFriend().get(position).message.image));
+                byte[] decodedString = Base64.decode(listFriend.getListFriend().get(position).message.image, Base64.DEFAULT);
+                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT);
             } else {
                 ((ItemFriendViewHolder) holder).txtMessage.setText(listFriend.getListFriend().get(position).message.text.substring((id + "").length()));
-                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeFile(listFriend.getListFriend().get(position).message.image.substring((id + "").length())));
+                byte[] decodedString = Base64.decode(listFriend.getListFriend().get(position).message.image.substring((id + "").length()), Base64.DEFAULT);
+                ((ItemFriendViewHolder) holder).img.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
                 ((ItemFriendViewHolder) holder).txtMessage.setTypeface(Typeface.DEFAULT_BOLD);
                 ((ItemFriendViewHolder) holder).txtName.setTypeface(Typeface.DEFAULT_BOLD);
             }

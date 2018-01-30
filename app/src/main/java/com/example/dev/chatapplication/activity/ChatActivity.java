@@ -1,6 +1,7 @@
 package com.example.dev.chatapplication.activity;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,11 +41,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -69,7 +75,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgSelect;
     public static String temp;
     private static final int STORAGE_PERMISSION_CODE = 23;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,27 +197,32 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Uri selectedImage = data.getData();
-        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        if (data != null) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
 
-        Cursor cursor = getContentResolver().query(selectedImage,
-                filePathColumn, null, null, null);
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
 
-        cursor.moveToFirst();
+            cursor.moveToFirst();
 
-        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-        imgPath = cursor.getString(columnIndex);
-        File imageFile = new File(imgPath);
-        imgSelect.setVisibility(View.VISIBLE);
-        Bitmap bmp=BitmapFactory.decodeFile(imageFile.getAbsolutePath());
-        imgSelect.setImageBitmap(bmp);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        temp = Base64.encodeToString(b, Base64.DEFAULT);
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            imgPath = cursor.getString(columnIndex);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 8;
+//        File imageFile = new File(imgPath);
+            imgSelect.setVisibility(View.VISIBLE);
+            Bitmap bmp = BitmapFactory.decodeFile(imgPath,options);
+            imgSelect.setImageBitmap(bmp);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] b = baos.toByteArray();
+            temp = Base64.encodeToString(b, Base64.DEFAULT);
 //        Toast.makeText(ChatActivity.this, imgPath, Toast.LENGTH_SHORT).show();
-        cursor.close();
+            cursor.close();
+        }
+
     }
 
     @Override
@@ -239,6 +249,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 newMessage.timestamp = System.currentTimeMillis();
                 FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
                 temp = null;
+                Log.e("image", " has " + newMessage.image);
             }
         } else if (view.getId() == R.id.btnShare) {
             requestStoragePermissionToMashmallow();
@@ -278,8 +289,14 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ItemMessageFriendHolder) {
-            byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
-            ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString,0, decodedString.length));
+            if (consersation.getListMessageData().get(position).image != null) {
+                ((ItemMessageFriendHolder) holder).imgShare.setVisibility(View.VISIBLE);
+                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+                ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+            } else {
+                ((ItemMessageFriendHolder) holder).imgShare.setVisibility(View.GONE);
+            }
+
             ((ItemMessageFriendHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
             Bitmap currentAvata = bitmapAvata.get(consersation.getListMessageData().get(position).idSender);
             if (currentAvata != null) {
@@ -311,15 +328,22 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
         } else if (holder instanceof ItemMessageUserHolder) {
-            byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
-            ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString,0, decodedString.length));
+
+            if (consersation.getListMessageData().get(position).image != null && consersation.getListMessageData().get(position).image.length() > 0) {
+                ((ItemMessageUserHolder) holder).imgShare.setVisibility(View.VISIBLE);
+                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+                ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+            } else {
+                ((ItemMessageUserHolder) holder).imgShare.setVisibility(View.GONE);
+            }
+
             ((ItemMessageUserHolder) holder).txtContent.setText(consersation.getListMessageData().get(position).text);
             if (bitmapAvataUser != null) {
                 ((ItemMessageUserHolder) holder).avata.setImageBitmap(bitmapAvataUser);
             }
 
-
         }
+
     }
 
     @Override

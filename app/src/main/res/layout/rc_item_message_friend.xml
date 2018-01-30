@@ -29,10 +29,11 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#000" />
     <ImageView
+        android:layout_marginStart="5dp"
         android:id="@+id/imgShareFriend"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
+        android:layout_below="@id/textContentFriend"
         android:scaleType="centerCrop" />
 
 </RelativeLayout>

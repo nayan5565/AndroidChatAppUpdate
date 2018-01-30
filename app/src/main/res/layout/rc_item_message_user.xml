@@ -32,7 +32,8 @@
         android:id="@+id/imgShare"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
+        android:layout_below="@id/textContentUser"
+        android:layout_toStartOf="@id/imageView2"
         android:scaleType="centerCrop" />
 
 </RelativeLayout>
