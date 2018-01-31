@@ -16,4 +16,7 @@
     <string name="hint_username">Enter a new username</string>
     <string name="hint_email_reset">Enter your email</string>
     <string name="enter_group_name">Enter group name</string>
+    <string name="log_out">Log_out</string>
+    <string name="need_a_new_account">need_a_new_account</string>
+    <string name="default_status">Hi there, i am using chat app</string>
 </resources>

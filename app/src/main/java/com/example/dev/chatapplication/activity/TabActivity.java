@@ -43,7 +43,7 @@ public class TabActivity extends AppCompatActivity {
     public static String STR_GROUP_FRAGMENT = "GROUP";
     public static String STR_INFO_FRAGMENT = "INFO";
 
-    private FloatingActionButton floatButton;
+    private FloatingActionButton floatButton,fab;
     private ViewPagerAdapter adapter;
 
     private FirebaseAuth mAuth;
@@ -59,6 +59,13 @@ public class TabActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         floatButton = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab2);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(TabActivity.this,MainActivityNew.class));
+            }
+        });
         initTab();
         initFirebase();
     }

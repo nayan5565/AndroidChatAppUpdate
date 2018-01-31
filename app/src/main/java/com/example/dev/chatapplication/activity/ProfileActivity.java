@@ -64,7 +64,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
-        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
@@ -98,12 +98,12 @@ public class ProfileActivity extends AppCompatActivity {
 
                 String display_name = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+//                String image = dataSnapshot.child("image").getValue().toString();
 
                 mProfileName.setText(display_name);
                 mProfileStatus.setText(status);
 
-                Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avata).into(mProfileImage);
+//                Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avata).into(mProfileImage);
 
                 if(mCurrent_user.getUid().equals(user_id)){
 
