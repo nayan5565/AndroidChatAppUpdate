@@ -25,6 +25,7 @@ import com.example.dev.chatapplication.model.GetTimeAgo;
 import com.example.dev.chatapplication.model.MessageNew2;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -88,11 +89,20 @@ public class ChatActivityNew extends AppCompatActivity {
     private String mLastKey = "";
     private String mPrevKey = "";
 
+    //Analytics
+
+    FirebaseAnalytics firebaseAnalytics;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_new);
+
+        firebaseAnalytics=FirebaseAnalytics.getInstance(this);
+        firebaseAnalytics.setCurrentScreen(this,"ChatAct"," acticity");
+        firebaseAnalytics.setUserProperty("nayan","nayan");
+        analytics("one","chatactivity");
 
 //        mChatToolbar = (Toolbar) findViewById(R.id.chat_app_bar);
 //        setSupportActionBar(mChatToolbar);
@@ -258,7 +268,13 @@ public class ChatActivityNew extends AppCompatActivity {
 
 
     }
-
+public void analytics(String id,String name){
+    Bundle bundle = new Bundle();
+    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id);
+    bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
+    bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
