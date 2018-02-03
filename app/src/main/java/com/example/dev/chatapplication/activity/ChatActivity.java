@@ -35,12 +35,18 @@ import com.example.dev.chatapplication.model.Message2;
 import com.example.dev.chatapplication.tools.SharedPreferenceHelper;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
@@ -63,8 +69,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public static final int VIEW_TYPE_USER_MESSAGE = 0;
     public static final int VIEW_TYPE_FRIEND_MESSAGE = 1;
     private ListMessageAdapter adapter;
-    private String roomId;
-    private ArrayList<CharSequence> idFriend;
+    private String roomId,idFriend;
+//    private ArrayList<CharSequence> idFriend;
     private Consersation consersation;
     private ImageButton btnSend;
     private EditText editWriteMessage;
@@ -76,6 +82,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgSelect;
     public static String temp;
     private static final int STORAGE_PERMISSION_CODE = 23;
+    private StorageReference mImageStorage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +94,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //        if (imgPath != null) {
 //            imgSelect.setBackgroundResource(Integer.parseInt(imgPath));
 //        }
+        mImageStorage = FirebaseStorage.getInstance().getReference();
         btnShare.setOnClickListener(this);
         Intent intentData = getIntent();
-        idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
+        idFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ID);
+//        idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
 
@@ -171,10 +181,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             //If permission is granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+//                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//
+//                startActivityForResult(galleryIntent, 1);
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(galleryIntent, 1);
+                startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), 1);
                 //Displaying a toast
 //                Utils.toastMassage(this, "Permission granted now you can read the storage");
             } else {
@@ -185,13 +200,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent result = new Intent();
-            result.putExtra("idFriend", idFriend.get(0));
+            result.putExtra("idFriend", idFriend);
+//            result.putExtra("idFriend", idFriend.get(0));
             setResult(RESULT_OK, result);
             this.finish();
         }
@@ -203,6 +217,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
             Uri selectedImage = data.getData();
+            StorageReference filepath = mImageStorage.child("message_images").child(Utils.getToday() + ".jpg");
+
+            filepath.putFile(selectedImage).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                    if (task.isSuccessful()) {
+
+                        String download_url = task.getResult().getDownloadUrl().toString();
+
+                        temp = download_url;
+
+                    }
+
+                }
+            });
+
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
 
@@ -219,12 +250,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             imgSelect.setVisibility(View.VISIBLE);
             Bitmap bmp = BitmapFactory.decodeFile(imgPath,options);
             imgSelect.setImageBitmap(bmp);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
-            byte[] b = baos.toByteArray();
-            temp = Base64.encodeToString(b, Base64.DEFAULT);
-//        Toast.makeText(ChatActivity.this, imgPath, Toast.LENGTH_SHORT).show();
-            cursor.close();
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+//            byte[] b = baos.toByteArray();
+//            temp = Base64.encodeToString(b, Base64.DEFAULT);
+////        Toast.makeText(ChatActivity.this, imgPath, Toast.LENGTH_SHORT).show();
+//            cursor.close();
         }
 
     }
@@ -232,7 +263,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onBackPressed() {
         Intent result = new Intent();
-        result.putExtra("idFriend", idFriend.get(0));
+        result.putExtra("idFriend", idFriend);
+//        result.putExtra("idFriend", idFriend.get(0));
         setResult(RESULT_OK, result);
         this.finish();
     }
@@ -295,8 +327,9 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (holder instanceof ItemMessageFriendHolder) {
             if (consersation.getListMessageData().get(position).image != null) {
                 ((ItemMessageFriendHolder) holder).imgShare.setVisibility(View.VISIBLE);
-                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
-                ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+//                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+//                ((ItemMessageFriendHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                Picasso.with(context).load(consersation.getListMessageData().get(position).image).placeholder(R.drawable.default_avata).into(((ItemMessageFriendHolder) holder).imgShare);
             } else {
                 ((ItemMessageFriendHolder) holder).imgShare.setVisibility(View.GONE);
             }
@@ -335,8 +368,9 @@ class ListMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             if (consersation.getListMessageData().get(position).image != null && consersation.getListMessageData().get(position).image.length() > 0) {
                 ((ItemMessageUserHolder) holder).imgShare.setVisibility(View.VISIBLE);
-                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
-                ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+//                byte[] decodedString = Base64.decode(consersation.getListMessageData().get(position).image, Base64.DEFAULT);
+//                ((ItemMessageUserHolder) holder).imgShare.setImageBitmap(BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                Picasso.with(context).load(consersation.getListMessageData().get(position).image).placeholder(R.drawable.default_avata).into(((ItemMessageUserHolder) holder).imgShare);
             } else {
                 ((ItemMessageUserHolder) holder).imgShare.setVisibility(View.GONE);
             }

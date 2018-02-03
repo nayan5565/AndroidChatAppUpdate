@@ -8,7 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.activity.ChatActivityNew;
 import com.example.dev.chatapplication.model.MessageNew2;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +31,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private List<MessageNew2> mMessageList;
     private DatabaseReference mUserDatabase;
+    private FirebaseAuth mAuth;
 
     public MessageAdapter(List<MessageNew2> mMessageList) {
 
@@ -48,10 +51,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView messageText;
-        public CircleImageView profileImage;
-        public TextView displayName;
-        public ImageView messageImage;
+        public TextView messageText,messageText2;
+        public CircleImageView profileImage,profileImage2;
+        public TextView displayName,displayName2;
+        public ImageView messageImage,messageImage2;
 
         public MessageViewHolder(View view) {
             super(view);
@@ -71,7 +74,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         String from_user = c.getFrom();
         String message_type = c.getType();
-
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(from_user);
 
@@ -94,6 +96,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             }
         });
+
 
         if(message_type.equals("text")) {
 

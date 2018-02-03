@@ -15,9 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.activity.ChatActivity;
 import com.example.dev.chatapplication.activity.ChatActivityNew;
 import com.example.dev.chatapplication.activity.ProfileActivity;
 import com.example.dev.chatapplication.model.Friends;
+import com.example.dev.chatapplication.tools.StaticConfig;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -99,7 +101,6 @@ public class FriendsFragmentNew extends Fragment {
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-
                         final String userName = dataSnapshot.child("name").getValue().toString();
 //                        String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
 
@@ -137,9 +138,12 @@ public class FriendsFragmentNew extends Fragment {
 
                                         if(i == 1){
 
-                                            Intent chatIntent = new Intent(getContext(), ChatActivityNew.class);
+                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                             chatIntent.putExtra("user_id", list_user_id);
                                             chatIntent.putExtra("user_name", userName);
+                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, userName);
+                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, list_user_id);
+//                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
                                             startActivity(chatIntent);
 
                                         }
