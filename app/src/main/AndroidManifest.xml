@@ -47,6 +47,7 @@
         <activity android:name=".activity.MainActivityNew"/>
         <activity android:name=".activity.ChatActivityNew"
             android:parentActivityName=".activity.MainActivityNew"/>
+        <activity android:name=".activity.FriendRequiestActivity"/>
 
         <service
             android:name=".service.FriendChatService"

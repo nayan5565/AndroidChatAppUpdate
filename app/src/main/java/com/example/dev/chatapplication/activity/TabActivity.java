@@ -28,6 +28,7 @@ import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,29 +195,62 @@ public class TabActivity extends AppCompatActivity {
 //            this.finish();
 //        }
 //    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.about) {
+//            Toast.makeText(this, "ChatApp version 1.0", Toast.LENGTH_LONG).show();
+//            return true;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        super.onOptionsItemSelected(item);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.about) {
-            Toast.makeText(this, "ChatApp version 1.0", Toast.LENGTH_LONG).show();
-            return true;
+
+        if(item.getItemId() == R.id.main_settings_btn){
+
+            Intent settingsIntent = new Intent(TabActivity.this, FriendRequiestActivity.class);
+            startActivity(settingsIntent);
+
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+        if(item.getItemId() == R.id.main_all_btn){
 
+            Intent settingsIntent = new Intent(TabActivity.this, UserActivityNew.class);
+            startActivity(settingsIntent);
+
+        }
+
+        return true;
+    }
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
