@@ -3,11 +3,14 @@ package com.example.dev.chatapplication.fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.activity.ChatActivity;
 import com.example.dev.chatapplication.activity.ChatActivityNew;
 import com.example.dev.chatapplication.activity.ProfileActivity;
 import com.example.dev.chatapplication.model.Friends;
+import com.example.dev.chatapplication.tools.StaticConfig;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +31,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -45,6 +53,8 @@ public class FriendsFragmentNew extends Fragment {
 
     private View mMainView;
 
+    public Bitmap bitmapAvataUser;
+
 
     public FriendsFragmentNew() {
         // Required empty public constructor
@@ -60,9 +70,9 @@ public class FriendsFragmentNew extends Fragment {
         mFriendsList = (RecyclerView) mMainView.findViewById(R.id.friends_list);
         mAuth = FirebaseAuth.getInstance();
 
-        mCurrent_user_id = mAuth.getCurrentUser().getUid();
+//        mCurrent_user_id = mAuth.getCurrentUser().getUid();
 
-        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrent_user_id);
+        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends").child(StaticConfig.UID);
         mFriendsDatabase.keepSynced(true);
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user");
         mUsersDatabase.keepSynced(true);
@@ -99,19 +109,29 @@ public class FriendsFragmentNew extends Fragment {
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-
                         final String userName = dataSnapshot.child("name").getValue().toString();
-//                        String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
+                        final String userThumb = dataSnapshot.child("avata").getValue().toString();
 
-                        if(dataSnapshot.hasChild("online")) {
+                        if (dataSnapshot.hasChild("online")) {
 
                             String userOnline = dataSnapshot.child("online").getValue().toString();
                             friendsViewHolder.setUserOnline(userOnline);
 
                         }
 
+                        if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                            byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
+                            bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        } else {
+                            bitmapAvataUser = null;
+                        }
+
+                        if (bitmapAvataUser!=null){
+                            friendsViewHolder.setUserImage(bitmapAvataUser, getContext());
+                        }
+
                         friendsViewHolder.setName(userName);
-//                        friendsViewHolder.setUserImage(userThumb, getContext());
+
 
                         friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -127,7 +147,7 @@ public class FriendsFragmentNew extends Fragment {
                                     public void onClick(DialogInterface dialogInterface, int i) {
 
                                         //Click Event for each item.
-                                        if(i == 0){
+                                        if (i == 0) {
 
                                             Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
                                             profileIntent.putExtra("user_id", list_user_id);
@@ -135,11 +155,25 @@ public class FriendsFragmentNew extends Fragment {
 
                                         }
 
-                                        if(i == 1){
+                                        if (i == 1) {
 
-                                            Intent chatIntent = new Intent(getContext(), ChatActivityNew.class);
+                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                             chatIntent.putExtra("user_id", list_user_id);
                                             chatIntent.putExtra("user_name", userName);
+                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, userName);
+//                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, list_user_id);
+                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, list_user_id);
+
+                                            ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
+                                            idFriend.add(list_user_id);
+                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
+                                            ChatActivity.bitmapAvataFriend = new HashMap<>();
+                                            if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                                                byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
+                                                ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                                            } else {
+                                                ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeResource(getContext().getResources(), R.drawable.friend));
+                                            }
                                             startActivity(chatIntent);
 
                                         }
@@ -181,24 +215,25 @@ public class FriendsFragmentNew extends Fragment {
 
         }
 
-        public void setDate(String date){
+        public void setDate(String date) {
 
             TextView userStatusView = (TextView) mView.findViewById(R.id.user_single_status);
             userStatusView.setText(date);
 
         }
 
-        public void setName(String name){
+        public void setName(String name) {
 
             TextView userNameView = (TextView) mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
 
         }
 
-        public void setUserImage(String thumb_image, Context ctx){
+        public void setUserImage(Bitmap bitmapAvataUser, Context ctx) {
 
             CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
-            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_avata).into(userImageView);
+            userImageView.setImageBitmap(bitmapAvataUser);
+//            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_avata).into(userImageView);
 
         }
 
@@ -206,7 +241,7 @@ public class FriendsFragmentNew extends Fragment {
 
             ImageView userOnlineView = (ImageView) mView.findViewById(R.id.user_single_online_icon);
 
-            if(online_status.equals("true")){
+            if (online_status.equals("true")) {
 
                 userOnlineView.setVisibility(View.VISIBLE);
 

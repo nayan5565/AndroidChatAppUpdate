@@ -23,6 +23,7 @@ import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.adapter.MessageAdapter;
 import com.example.dev.chatapplication.model.GetTimeAgo;
 import com.example.dev.chatapplication.model.MessageNew2;
+import com.example.dev.chatapplication.tools.StaticConfig;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -52,7 +53,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivityNew extends AppCompatActivity {
 
-    private String mChatUser;
+    public static String mChatUser;
+    public static String mCurrentUserId;
     private Toolbar mChatToolbar;
 
     private DatabaseReference mRootRef;
@@ -61,7 +63,7 @@ public class ChatActivityNew extends AppCompatActivity {
     private TextView mLastSeenView;
     private CircleImageView mProfileImage;
     private FirebaseAuth mAuth;
-    private String mCurrentUserId;
+
 
     private ImageButton mChatAddBtn;
     private ImageButton mChatSendBtn;
@@ -477,6 +479,8 @@ public void analytics(String id,String name){
             String push_id = user_message_push.getKey();
 
             Map messageMap = new HashMap();
+            messageMap.put("idSender", StaticConfig.UID);
+            messageMap.put("message", message);
             messageMap.put("message", message);
             messageMap.put("seen", false);
             messageMap.put("type", "text");
