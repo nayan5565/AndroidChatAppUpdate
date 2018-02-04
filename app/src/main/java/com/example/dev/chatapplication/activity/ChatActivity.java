@@ -123,6 +123,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //        idFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         idFriend = intentData.getCharSequenceArrayListExtra(StaticConfig.INTENT_KEY_CHAT_ID);
         roomId = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID);
+//        roomId =mCurrentUserId+mChatUser;
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
 
         consersation = new Consersation();
@@ -146,7 +147,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
             adapter = new ListMessageAdapter(this, consersation, bitmapAvataFriend, bitmapAvataUser);
-            FirebaseDatabase.getInstance().getReference().child("message").child(StaticConfig.UID).child(mChatUser).addChildEventListener(new ChildEventListener() {
+            FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Log.e("message "," come");
@@ -231,8 +232,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent result = new Intent();
-            result.putExtra("idFriend", idFriend);
-//            result.putExtra("idFriend", idFriend.get(0));
+//            result.putExtra("idFriend", idFriend);
+            result.putExtra("idFriend", idFriend.get(0));
             setResult(RESULT_OK, result);
             this.finish();
         }
@@ -370,9 +371,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 newMessage.text = content;
                 newMessage.image = temp;
                 newMessage.idSender = StaticConfig.UID;
-                newMessage.idReceiver = mChatUser;
+                newMessage.idReceiver = roomId;
                 newMessage.timestamp = System.currentTimeMillis();
-                FirebaseDatabase.getInstance().getReference().child("message").child(StaticConfig.UID).child(mChatUser).push().setValue(newMessage);
+                FirebaseDatabase.getInstance().getReference().child("message/" + roomId).push().setValue(newMessage);
                 temp = null;
                 Log.e("image", " has " + newMessage.image);
             }

@@ -34,6 +34,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -55,6 +56,10 @@ public class FriendsFragmentNew extends Fragment {
 
     public Bitmap bitmapAvataUser;
 
+    private String idRoom;
+
+    private ArrayList<String> listFriendID = null;
+
 
     public FriendsFragmentNew() {
         // Required empty public constructor
@@ -66,7 +71,7 @@ public class FriendsFragmentNew extends Fragment {
                              Bundle savedInstanceState) {
 
         mMainView = inflater.inflate(R.layout.fragment_friends, container, false);
-
+        listFriendID = new ArrayList<>();
         mFriendsList = (RecyclerView) mMainView.findViewById(R.id.friends_list);
         mAuth = FirebaseAuth.getInstance();
 
@@ -100,91 +105,118 @@ public class FriendsFragmentNew extends Fragment {
 
         ) {
             @Override
-            protected void populateViewHolder(final FriendsViewHolder friendsViewHolder, Friends friends, int i) {
+            protected void populateViewHolder(final FriendsViewHolder friendsViewHolder, Friends friends, final int k) {
+                FirebaseDatabase.getInstance().getReference().child("Friends/" + StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() != null) {
+                            HashMap mapRecord = (HashMap) dataSnapshot.getValue();
+                            Iterator listKey = mapRecord.keySet().iterator();
+                            while (listKey.hasNext()) {
+                                String key = listKey.next().toString();
+                                listFriendID.add(mapRecord.get(key).toString());
 
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
                 friendsViewHolder.setDate(friends.getDate());
 
-                final String list_user_id = getRef(i).getKey();
+                final String list_user_id = getRef(k).getKey();
+//                final String idRoom;
 
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        final String userName = dataSnapshot.child("name").getValue().toString();
-                        final String userThumb = dataSnapshot.child("avata").getValue().toString();
+                        if (dataSnapshot.getValue() == null) {
+                            //email not found
 
-                        if (dataSnapshot.hasChild("online")) {
-
-                            String userOnline = dataSnapshot.child("online").getValue().toString();
-                            friendsViewHolder.setUserOnline(userOnline);
-
-                        }
-
-                        if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                            byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
-                            bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                         } else {
-                            bitmapAvataUser = null;
-                        }
+                            final String userName = dataSnapshot.child("name").getValue().toString();
+                            final String userThumb = dataSnapshot.child("avata").getValue().toString();
+                            final String email = dataSnapshot.child("email").getValue().toString();
 
-                        if (bitmapAvataUser!=null){
-                            friendsViewHolder.setUserImage(bitmapAvataUser, getContext());
-                        }
+                            if (dataSnapshot.hasChild("online")) {
 
-                        friendsViewHolder.setName(userName);
-
-
-                        friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-
-                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
-
-                                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-                                builder.setTitle("Select Options");
-                                builder.setItems(options, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                                        //Click Event for each item.
-                                        if (i == 0) {
-
-                                            Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
-                                            profileIntent.putExtra("user_id", list_user_id);
-                                            startActivity(profileIntent);
-
-                                        }
-
-                                        if (i == 1) {
-
-                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                            chatIntent.putExtra("user_id", list_user_id);
-                                            chatIntent.putExtra("user_name", userName);
-                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, userName);
-//                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, list_user_id);
-                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, list_user_id);
-
-                                            ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
-                                            idFriend.add(list_user_id);
-                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
-                                            ChatActivity.bitmapAvataFriend = new HashMap<>();
-                                            if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                                                byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
-                                                ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                                            } else {
-                                                ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeResource(getContext().getResources(), R.drawable.friend));
-                                            }
-                                            startActivity(chatIntent);
-
-                                        }
-
-                                    }
-                                });
-
-                                builder.show();
+                                String userOnline = dataSnapshot.child("online").getValue().toString();
+                                friendsViewHolder.setUserOnline(userOnline);
 
                             }
-                        });
+
+                            if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                                byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
+                                bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                            } else {
+                                bitmapAvataUser = null;
+                            }
+
+                            if (bitmapAvataUser != null) {
+                                friendsViewHolder.setUserImage(bitmapAvataUser, getContext());
+                            }
+
+                            friendsViewHolder.setName(userName);
+
+
+                            friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
+
+                                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                                    builder.setTitle("Select Options");
+                                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            //Click Event for each item.
+                                            if (i == 0) {
+
+                                                Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                                                profileIntent.putExtra("user_id", list_user_id);
+                                                profileIntent.putExtra("email", email);
+                                                startActivity(profileIntent);
+
+                                            }
+
+                                            if (i == 1) {
+                                                idRoom = listFriendID.get(k);
+                                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                                chatIntent.putExtra("user_id", list_user_id);
+                                                chatIntent.putExtra("user_name", userName);
+                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, userName);
+//                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, list_user_id);
+                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
+
+                                                ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
+                                                idFriend.add(list_user_id);
+                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
+                                                ChatActivity.bitmapAvataFriend = new HashMap<>();
+                                                if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                                                    byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
+                                                    ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
+                                                } else {
+                                                    ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeResource(getContext().getResources(), R.drawable.friend));
+                                                }
+                                                startActivity(chatIntent);
+
+
+                                            }
+
+                                        }
+                                    });
+
+                                    builder.show();
+
+                                }
+                            });
+                        }
 
 
                     }

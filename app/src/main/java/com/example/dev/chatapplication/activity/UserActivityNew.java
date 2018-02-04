@@ -45,7 +45,7 @@ public class UserActivityNew extends AppCompatActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user");
-
+        mUsersDatabase.keepSynced(true);
         mLayoutManager = new LinearLayoutManager(this);
 
         mUsersList = (RecyclerView) findViewById(R.id.users_list);
@@ -108,14 +108,14 @@ public class UserActivityNew extends AppCompatActivity {
 
         }
 
-        public void setDisplayName(String name){
+        public void setDisplayName(String name) {
 
             TextView userNameView = (TextView) mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
 
         }
 
-        public void setUserStatus(String status){
+        public void setUserStatus(String status) {
 
             TextView userStatusView = (TextView) mView.findViewById(R.id.user_single_status);
             userStatusView.setText(status);
@@ -123,7 +123,7 @@ public class UserActivityNew extends AppCompatActivity {
 
         }
 
-        public void setUserImage(String thumb_image, Context ctx){
+        public void setUserImage(String thumb_image, Context ctx) {
 
             CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
 

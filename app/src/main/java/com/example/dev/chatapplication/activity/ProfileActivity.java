@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.model.Friend;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -67,6 +69,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         final String user_id = getIntent().getStringExtra("user_id");
+        final String email = getIntent().getStringExtra("email");
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -247,6 +250,41 @@ public class ProfileActivity extends AppCompatActivity {
 
                             } else {
 
+                                FirebaseDatabase.getInstance().getReference().child("user").orderByChild("email")
+                                        .equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                        if (dataSnapshot.getValue() == null) {
+                                            //email not found
+
+                                        } else {
+                                            String id = ((HashMap) dataSnapshot.getValue()).keySet().iterator().next().toString();
+
+//                                            HashMap userMap = (HashMap) ((HashMap) dataSnapshot.getValue()).get(id);
+//                                            Friend user = new Friend();
+//                                            user.name = (String) userMap.get("name");
+//                                            user.email = (String) userMap.get("email");
+//                                            user.avata = (String) userMap.get("avata");
+//                                            user.id = id;
+//                                            user.idRoom = id.compareTo(StaticConfig.UID) > 0 ? (StaticConfig.UID + id).hashCode() + "" : "" + (id + StaticConfig.UID).hashCode();
+                                            FirebaseDatabase.getInstance().getReference().child("Friends/" + StaticConfig.UID).push().setValue(id);
+//                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                @Override
+//                                                public void onComplete(@NonNull Task<Void> task) {
+//                                                    if (task.isSuccessful()) {
+//                                                    }
+//                                                }
+//                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
                                 mCurrent_state = "req_sent";
                                 mProfileSendReqBtn.setText("Cancel Friend Request");
 
@@ -312,7 +350,40 @@ public class ProfileActivity extends AppCompatActivity {
 
 
                             if (databaseError == null) {
+                                FirebaseDatabase.getInstance().getReference().child("user").orderByChild("email")
+                                        .equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
+                                        if (dataSnapshot.getValue() == null) {
+                                            //email not found
+
+                                        } else {
+                                            String id = ((HashMap) dataSnapshot.getValue()).keySet().iterator().next().toString();
+
+//                                            HashMap userMap = (HashMap) ((HashMap) dataSnapshot.getValue()).get(id);
+//                                            Friend user = new Friend();
+//                                            user.name = (String) userMap.get("name");
+//                                            user.email = (String) userMap.get("email");
+//                                            user.avata = (String) userMap.get("avata");
+//                                            user.id = id;
+//                                            user.idRoom = id.compareTo(StaticConfig.UID) > 0 ? (StaticConfig.UID + id).hashCode() + "" : "" + (id + StaticConfig.UID).hashCode();
+                                            FirebaseDatabase.getInstance().getReference().child("Friends/" + id).push().setValue(StaticConfig.UID);
+//                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                @Override
+//                                                public void onComplete(@NonNull Task<Void> task) {
+//                                                    if (task.isSuccessful()) {
+//                                                    }
+//                                                }
+//                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                                 mProfileSendReqBtn.setEnabled(true);
                                 mCurrent_state = "friends";
                                 mProfileSendReqBtn.setText("Unfriend this Person");
