@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e("VH", " data " + userName2 + model.getContent());
 
 
-                viewHolder.setData(model.getUserName(), Utils.getToday(), model.getContent());
+//                viewHolder.setData(model.getUserName(), Utils.getToday(), model.getContent());
             }
         };
         recMessage.setAdapter(firebaseRecyclerAdapter);

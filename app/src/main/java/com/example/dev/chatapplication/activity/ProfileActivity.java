@@ -122,7 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mProfileName.setText(display_name);
                 mProfileStatus.setText(status);
 
-//                Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avata).into(mProfileImage);
+                Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avata).into(mProfileImage);
 
                 if (mCurrent_user.getUid().equals(user_id)) {
 
@@ -249,42 +249,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 Toast.makeText(ProfileActivity.this, "There was some error in sending request", Toast.LENGTH_SHORT).show();
 
                             } else {
-
-                                FirebaseDatabase.getInstance().getReference().child("user").orderByChild("email")
-                                        .equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                        if (dataSnapshot.getValue() == null) {
-                                            //email not found
-
-                                        } else {
-                                            String id = ((HashMap) dataSnapshot.getValue()).keySet().iterator().next().toString();
-
-//                                            HashMap userMap = (HashMap) ((HashMap) dataSnapshot.getValue()).get(id);
-//                                            Friend user = new Friend();
-//                                            user.name = (String) userMap.get("name");
-//                                            user.email = (String) userMap.get("email");
-//                                            user.avata = (String) userMap.get("avata");
-//                                            user.id = id;
-//                                            user.idRoom = id.compareTo(StaticConfig.UID) > 0 ? (StaticConfig.UID + id).hashCode() + "" : "" + (id + StaticConfig.UID).hashCode();
-                                            FirebaseDatabase.getInstance().getReference().child("Friends/" + StaticConfig.UID).push().setValue(id);
-//                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                                @Override
-//                                                public void onComplete(@NonNull Task<Void> task) {
-//                                                    if (task.isSuccessful()) {
-//                                                    }
-//                                                }
-//                                            });
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
                                 mCurrent_state = "req_sent";
                                 mProfileSendReqBtn.setText("Cancel Friend Request");
 
@@ -350,40 +314,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
                             if (databaseError == null) {
-                                FirebaseDatabase.getInstance().getReference().child("user").orderByChild("email")
-                                        .equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                        if (dataSnapshot.getValue() == null) {
-                                            //email not found
-
-                                        } else {
-                                            String id = ((HashMap) dataSnapshot.getValue()).keySet().iterator().next().toString();
-
-//                                            HashMap userMap = (HashMap) ((HashMap) dataSnapshot.getValue()).get(id);
-//                                            Friend user = new Friend();
-//                                            user.name = (String) userMap.get("name");
-//                                            user.email = (String) userMap.get("email");
-//                                            user.avata = (String) userMap.get("avata");
-//                                            user.id = id;
-//                                            user.idRoom = id.compareTo(StaticConfig.UID) > 0 ? (StaticConfig.UID + id).hashCode() + "" : "" + (id + StaticConfig.UID).hashCode();
-                                            FirebaseDatabase.getInstance().getReference().child("Friends/" + id).push().setValue(StaticConfig.UID);
-//                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                                @Override
-//                                                public void onComplete(@NonNull Task<Void> task) {
-//                                                    if (task.isSuccessful()) {
-//                                                    }
-//                                                }
-//                                            });
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
                                 mProfileSendReqBtn.setEnabled(true);
                                 mCurrent_state = "friends";
                                 mProfileSendReqBtn.setText("Unfriend this Person");

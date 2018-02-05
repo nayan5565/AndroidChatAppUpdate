@@ -1,10 +1,13 @@
 package com.example.dev.chatapplication.adapter;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
@@ -26,7 +29,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Dev on 1/31/2018.
  */
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
 
     private List<MessageNew2> mMessageList;
@@ -43,7 +46,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.message_single_layout ,parent, false);
+                .inflate(R.layout.message_single_layout, parent, false);
 
         return new MessageViewHolder(v);
 
@@ -51,18 +54,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView messageText,messageText2;
-        public CircleImageView profileImage,profileImage2;
-        public TextView displayName,displayName2;
-        public ImageView messageImage,messageImage2;
+        public TextView messageText, messageText2, time, time2;
+        public CircleImageView profileImage, profileImage2;
+        public TextView displayName, displayName2;
+        public ImageView messageImage, messageImage2;
+        public RelativeLayout relFriend, relUser;
 
         public MessageViewHolder(View view) {
             super(view);
-
+            relFriend = (RelativeLayout) view.findViewById(R.id.relFriend);
+            relUser = (RelativeLayout) view.findViewById(R.id.relUser);
+            time = (TextView) view.findViewById(R.id.time_text_layout);
+            time2 = (TextView) view.findViewById(R.id.time_text_layout2);
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
+            messageText2 = (TextView) view.findViewById(R.id.message_text_layout2);
             profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
+            profileImage2 = (CircleImageView) view.findViewById(R.id.message_profile_layout2);
             displayName = (TextView) view.findViewById(R.id.name_text_layout);
+            displayName2 = (TextView) view.findViewById(R.id.name_text_layout2);
             messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
+            messageImage2 = (ImageView) view.findViewById(R.id.message_image_layout2);
 
         }
     }
@@ -70,10 +81,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
-        MessageNew2 c = mMessageList.get(i);
+        final MessageNew2 c = mMessageList.get(i);
 
         String from_user = c.getFrom();
         String message_type = c.getType();
+
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(from_user);
 
@@ -82,12 +94,42 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String name = dataSnapshot.child("name").getValue().toString();
-//                String image = dataSnapshot.child("thumb_image").getValue().toString();
+                String image = dataSnapshot.child("avata").getValue().toString();
+                Log.e("cun " + name, " fun " + ChatActivityNew.userName);
 
-                viewHolder.displayName.setText(name);
-
-//                Picasso.with(viewHolder.profileImage.getContext()).load(image)
-//                        .placeholder(R.drawable.default_avata).into(viewHolder.profileImage);
+                if (name.equals(ChatActivityNew.userName)) {
+                    if (c.getImage() != null) {
+                        Picasso.with(viewHolder.profileImage.getContext()).load(c.getImage())
+                                .placeholder(R.drawable.default_avatar).into(viewHolder.messageImage);
+                        viewHolder.messageImage.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        viewHolder.messageImage.setVisibility(View.GONE);
+                    }
+                    viewHolder.displayName.setText(name);
+                    viewHolder.time.setText(c.getTime() + "");
+                    viewHolder.messageText.setText(c.getMessage());
+                    viewHolder.relUser.setVisibility(View.GONE);
+                    viewHolder.relFriend.setVisibility(View.VISIBLE);
+                    viewHolder.messageText.setTextColor(Color.RED);
+                } else {
+                    if (c.getImage() != null) {
+                        Picasso.with(viewHolder.profileImage.getContext()).load(c.getImage())
+                                .placeholder(R.drawable.default_avatar).into(viewHolder.messageImage2);
+                        viewHolder.messageImage2.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        viewHolder.messageImage2.setVisibility(View.GONE);
+                    }
+                    viewHolder.time2.setText(c.getTime() + "");
+                    viewHolder.displayName2.setText(name);
+                    viewHolder.messageText2.setText(c.getMessage());
+                    viewHolder.relUser.setVisibility(View.VISIBLE);
+                    viewHolder.relFriend.setVisibility(View.GONE);
+                    viewHolder.messageText2.setTextColor(Color.YELLOW);
+                }
+                Picasso.with(viewHolder.profileImage.getContext()).load(image)
+                        .placeholder(R.drawable.default_avatar).into(viewHolder.profileImage);
 
             }
 
@@ -98,19 +140,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         });
 
 
-        if(message_type.equals("text")) {
-
-            viewHolder.messageText.setText(c.getMessage());
-            viewHolder.messageImage.setVisibility(View.GONE);
-
-
-        } else {
-
-            viewHolder.messageText.setVisibility(View.INVISIBLE);
-            Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
-                    .placeholder(R.drawable.default_avata).into(viewHolder.messageImage);
-
-        }
+//        if (message_type.equals("text")) {
+//
+//            viewHolder.messageText.setText(c.getMessage());
+//            viewHolder.messageImage.setVisibility(View.INVISIBLE);
+//
+//
+//        } else {
+//
+//            viewHolder.messageText.setVisibility(View.INVISIBLE);
+//            Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
+//                    .placeholder(R.drawable.default_avatar).into(viewHolder.messageImage);
+//
+//        }
 
     }
 
@@ -118,10 +160,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public int getItemCount() {
         return mMessageList.size();
     }
-
-
-
-
 
 
 }

@@ -5,7 +5,7 @@ package com.example.dev.chatapplication.model;
  */
 
 public class MessageNew2 {
-    private String message, type;
+    private String message, type,image;
     private long  time;
     private boolean seen;
 
@@ -23,8 +23,9 @@ public class MessageNew2 {
         this.from = from;
     }
 
-    public MessageNew2(String message, String type, long time, boolean seen) {
+    public MessageNew2(String message,String image, String type, long time, boolean seen) {
         this.message = message;
+        this.image = image;
         this.type = type;
         this.time = time;
         this.seen = seen;
@@ -36,6 +37,14 @@ public class MessageNew2 {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getType() {

@@ -46,6 +46,7 @@
         <activity android:name=".activity.UserActivityNew" />
         <activity android:name=".activity.MainActivityNew"/>
         <activity android:name=".activity.ChatActivityNew"
+            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".activity.MainActivityNew"/>
         <activity android:name=".activity.FriendRequiestActivity"/>
 

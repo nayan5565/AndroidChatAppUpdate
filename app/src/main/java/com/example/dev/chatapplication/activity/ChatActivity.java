@@ -112,7 +112,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mChatUser = getIntent().getStringExtra("user_id");
 
 
-        btnShare = (Button) findViewById(R.id.btnShare);
+//        btnShare = (Button) findViewById(R.id.btnShare);
         imgSelect = (ImageView) findViewById(R.id.imgSelect);
 //        if (imgPath != null) {
 //            imgSelect.setBackgroundResource(Integer.parseInt(imgPath));
@@ -127,7 +127,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         String nameFriend = intentData.getStringExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND);
 
         consersation = new Consersation();
-        btnSend = (ImageButton) findViewById(R.id.btnSend);
+//        btnSend = (ImageButton) findViewById(R.id.btnSend);
         btnSend.setOnClickListener(this);
 
         String base64AvataUser = SharedPreferenceHelper.getInstance(this).getUserInfo().avata;
@@ -138,13 +138,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             bitmapAvataUser = null;
         }
 
-        editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
+//        editWriteMessage = (EditText) findViewById(R.id.editWriteMessage);
 
 
         if (idFriend != null && nameFriend != null) {
             getSupportActionBar().setTitle(nameFriend);
             linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-            recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
+//            recyclerChat = (RecyclerView) findViewById(R.id.recyclerChat);
             recyclerChat.setLayoutManager(linearLayoutManager);
             adapter = new ListMessageAdapter(this, consersation, bitmapAvataFriend, bitmapAvataUser);
             FirebaseDatabase.getInstance().getReference().child("message/" + roomId).addChildEventListener(new ChildEventListener() {
@@ -377,7 +377,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 temp = null;
                 Log.e("image", " has " + newMessage.image);
             }
-        } else if (view.getId() == R.id.btnShare) {
+//        } else if (view.getId() == R.id.btnShare) {
             requestStoragePermissionToMashmallow();
 
         }

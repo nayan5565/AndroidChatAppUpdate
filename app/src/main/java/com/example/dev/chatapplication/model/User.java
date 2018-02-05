@@ -9,7 +9,10 @@ import com.example.dev.chatapplication.tools.Status;
 public class User {
     public String name;
     public String email;
+    public String userStatus;
+    public String userOnline;
     public String avata;
+    public String deviceToken;
     public Status status;
     public Message2 message;
 

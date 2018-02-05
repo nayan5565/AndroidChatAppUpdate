@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +21,15 @@ import android.widget.Toast;
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +44,7 @@ public class RegistrationActvityNew extends AppCompatActivity {
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     private EditText editTextUsername, editTextPassword, editTextRepeatPassword;
     public static String STR_EXTRA_ACTION_REGISTER = "register";
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +162,11 @@ public class RegistrationActvityNew extends AppCompatActivity {
         String username = editTextUsername.getText().toString();
         String password = editTextPassword.getText().toString();
         String repeatPassword = editTextRepeatPassword.getText().toString();
+        String displayName=username.substring(0, username.indexOf("@"));
         if (validate(username, password, repeatPassword)) {
+
+
+
             Utils.savePref("UserEmail", username);
             Intent data = new Intent();
             data.putExtra(StaticConfig.STR_EXTRA_USERNAME, username);

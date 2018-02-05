@@ -28,6 +28,8 @@ import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
 import java.util.ArrayList;
@@ -54,10 +56,20 @@ public class TabActivity extends AppCompatActivity {
     private FirebaseUser user;
     private Status status;
 
+    private DatabaseReference mUserRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_activity);
+
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() != null) {
+
+
+            mUserRef = FirebaseDatabase.getInstance().getReference().child("user").child(mAuth.getCurrentUser().getUid());
+
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if(toolbar != null) {
             setSupportActionBar(toolbar);
@@ -79,7 +91,7 @@ public class TabActivity extends AppCompatActivity {
 
     private void initFirebase() {
         status = new Status();
-        mAuth = FirebaseAuth.getInstance();
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -102,6 +114,16 @@ public class TabActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser == null){
+
+
+        } else {
+
+            mUserRef.child("online").setValue("true");
+
+        }
         mAuth.addAuthStateListener(mAuthListener);
         ServiceUtils.stopServiceFriendChat(getApplicationContext(), false);
     }
@@ -109,6 +131,13 @@ public class TabActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if(currentUser != null) {
+
+            mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+
+        }
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -179,6 +208,8 @@ public class TabActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {

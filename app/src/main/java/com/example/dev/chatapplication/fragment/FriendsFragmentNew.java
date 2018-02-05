@@ -56,7 +56,6 @@ public class FriendsFragmentNew extends Fragment {
 
     public Bitmap bitmapAvataUser;
 
-    private String idRoom;
 
     private ArrayList<String> listFriendID = null;
 
@@ -128,7 +127,6 @@ public class FriendsFragmentNew extends Fragment {
                 friendsViewHolder.setDate(friends.getDate());
 
                 final String list_user_id = getRef(k).getKey();
-//                final String idRoom;
 
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
@@ -186,24 +184,10 @@ public class FriendsFragmentNew extends Fragment {
                                             }
 
                                             if (i == 1) {
-                                                idRoom = listFriendID.get(k);
-                                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                                Intent chatIntent = new Intent(getContext(), ChatActivityNew.class);
                                                 chatIntent.putExtra("user_id", list_user_id);
                                                 chatIntent.putExtra("user_name", userName);
-                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_FRIEND, userName);
-//                                            chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, list_user_id);
-                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ROOM_ID, idRoom);
-
-                                                ArrayList<CharSequence> idFriend = new ArrayList<CharSequence>();
-                                                idFriend.add(list_user_id);
-                                                chatIntent.putExtra(StaticConfig.INTENT_KEY_CHAT_ID, idFriend);
-                                                ChatActivity.bitmapAvataFriend = new HashMap<>();
-                                                if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
-                                                    byte[] decodedString = Base64.decode(userThumb, Base64.DEFAULT);
-                                                    ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length));
-                                                } else {
-                                                    ChatActivity.bitmapAvataFriend.put(list_user_id, BitmapFactory.decodeResource(getContext().getResources(), R.drawable.friend));
-                                                }
+                                                ChatActivityNew.userName = userName;
                                                 startActivity(chatIntent);
 
 

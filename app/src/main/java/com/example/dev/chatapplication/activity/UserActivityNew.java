@@ -71,7 +71,7 @@ public class UserActivityNew extends AppCompatActivity {
             protected void populateViewHolder(UsersViewHolder usersViewHolder, User users, int position) {
 
                 usersViewHolder.setDisplayName(users.name);
-//                usersViewHolder.setUserStatus(users.getStatus());
+                usersViewHolder.setUserStatus(users.userStatus);
 
 //                usersViewHolder.setUserImage(users.getThumb_image(), getApplicationContext());
 

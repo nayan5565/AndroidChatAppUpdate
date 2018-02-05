@@ -27,8 +27,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
@@ -54,6 +56,7 @@ public class LoginActivityNew extends AppCompatActivity {
     private FirebaseUser user;
     private boolean firstTimeAccess;
     private String userEmail;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onStart() {
@@ -340,6 +343,8 @@ public class LoginActivityNew extends AppCompatActivity {
                     waitingDialog.dismiss();
                     HashMap hashUser = (HashMap) dataSnapshot.getValue();
                     User userInfo = new User();
+                    userInfo.userStatus = (String) hashUser.get("userStatus");
+//                    userInfo.deviceToken = (String) hashUser.get("deviceToken");
                     userInfo.name = (String) hashUser.get("name");
                     userInfo.email = (String) hashUser.get("email");
                     userInfo.avata = (String) hashUser.get("avata");
@@ -354,11 +359,40 @@ public class LoginActivityNew extends AppCompatActivity {
         }
 
         void initNewUserInfo() {
+            String device_token = FirebaseInstanceId.getInstance().getToken();
             User newUser = new User();
             newUser.email = user.getEmail();
+            newUser.userStatus = "Hi there I'm using Chat App.";
+//            newUser.deviceToken = device_token;
             newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
             newUser.avata = StaticConfig.STR_DEFAULT_BASE64;
             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
+
+//            FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+//            String uid = current_user.getUid();
+//
+//            mDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(uid);
+//
+//
+//            HashMap<String, String> userMap = new HashMap<>();
+//            userMap.put("name", user.getEmail().substring(0, user.getEmail().indexOf("@")) );
+//            userMap.put("status_one", "Hi there I'm using Chat App.");
+//            userMap.put("email", user.getEmail());
+//            userMap.put("image", "default");
+//            userMap.put("avata", StaticConfig.STR_DEFAULT_BASE64);
+//            userMap.put("thumb_image", "default");
+//            userMap.put("device_token", device_token);
+//
+//            mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//
+//                    if(task.isSuccessful()){
+//
+//                    }
+//
+//                }
+//            });
         }
     }
 }
