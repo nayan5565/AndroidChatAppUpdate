@@ -19,6 +19,7 @@ import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.model.Friends;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +27,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -36,19 +39,24 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendRequiestActivity extends AppCompatActivity {
     private DatabaseReference mFriendReqDatabase;
+    private DatabaseReference mFriendReqDatabase2;
     private FirebaseUser mCurrent_user;
     public Bitmap bitmapAvataUser;
     private RecyclerView mFriendsList;
     private DatabaseReference mUsersDatabase;
+    private ArrayList<String> listFriendID = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_req);
+        listFriendID = new ArrayList<>();
         mFriendsList = (RecyclerView) findViewById(R.id.recFriend);
         mFriendsList.setHasFixedSize(true);
+        mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
         mFriendsList.setLayoutManager(new LinearLayoutManager(FriendRequiestActivity.this));
-        mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
+        mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req").child( StaticConfig.UID);
+//        mFriendReqDatabase2= mFriendReqDatabase.child(mCurrent_user.getUid()).child("request_type").child("received");
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user");
         mUsersDatabase.keepSynced(true);
         mFriendReqDatabase.keepSynced(true);
@@ -69,26 +77,22 @@ public class FriendRequiestActivity extends AppCompatActivity {
         ) {
             @Override
             protected void populateViewHolder(final FriendRequiestActivity.FriendsViewHolder friendsViewHolder, Friends friends, int i) {
-
-                friendsViewHolder.setDate(friends.getDate());
-
                 final String list_user_id = getRef(i).getKey();
-
-                mFriendReqDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference().child("Friend_req/" + StaticConfig.UID).child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        if (dataSnapshot.hasChild(list_user_id)) {
-
-                            String req_type = dataSnapshot.child(list_user_id).child("request_type").getValue().toString();
+                        if (dataSnapshot.getValue() != null) {
+                            String req_type = dataSnapshot.child("request_type").getValue().toString();
 
                             if (req_type.equals("received")) {
 
+                                mFriendsList.setVisibility(View.VISIBLE);
                                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         final String userName = dataSnapshot.child("name").getValue().toString();
                                         final String userThumb = dataSnapshot.child("avata").getValue().toString();
+                                        final String email = dataSnapshot.child("email").getValue().toString();
 
 
                                         if (!userThumb.equals(StaticConfig.STR_DEFAULT_BASE64)) {
@@ -103,6 +107,17 @@ public class FriendRequiestActivity extends AppCompatActivity {
                                         }
 
                                         friendsViewHolder.setName(userName);
+                                        friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                                profileIntent.putExtra("user_id", list_user_id);
+                                                profileIntent.putExtra("email", email);
+                                                startActivity(profileIntent);
+                                                finish();
+
+                                            }
+                                        });
 
                                     }
 
@@ -112,17 +127,30 @@ public class FriendRequiestActivity extends AppCompatActivity {
                                     }
                                 });
 
+                            }
+                            else {
+                                mFriendsList.setVisibility(View.GONE);
+                            }
+                            HashMap mapRecord = (HashMap) dataSnapshot.getValue();
+                            Iterator listKey = mapRecord.keySet().iterator();
+                            while (listKey.hasNext()) {
+                                String key = listKey.next().toString();
+                                listFriendID.add(mapRecord.get(key).toString());
+
 
                             }
                         }
-
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
                     }
                 });
+                friendsViewHolder.setDate(friends.getDate());
+
+
+
+
 
             }
         };

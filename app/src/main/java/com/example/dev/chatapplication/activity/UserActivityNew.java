@@ -2,17 +2,21 @@ package com.example.dev.chatapplication.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.model.User;
 import com.example.dev.chatapplication.model.UserNew2;
+import com.example.dev.chatapplication.tools.StaticConfig;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,17 +36,18 @@ public class UserActivityNew extends AppCompatActivity {
     private DatabaseReference mUsersDatabase;
 
     private LinearLayoutManager mLayoutManager;
+    public Bitmap bitmapAvataUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
 
-//        mToolbar = (Toolbar) findViewById(R.id.users_appBar);
-//        setSupportActionBar(mToolbar);
-
-//        getSupportActionBar().setTitle("All Users");
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbar = (Toolbar) findViewById(R.id.users_appBar);
+        setSupportActionBar(mToolbar);
+//
+        getSupportActionBar().setTitle("All Users");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user");
         mUsersDatabase.keepSynced(true);
@@ -73,7 +78,15 @@ public class UserActivityNew extends AppCompatActivity {
                 usersViewHolder.setDisplayName(users.name);
                 usersViewHolder.setUserStatus(users.userStatus);
 
-//                usersViewHolder.setUserImage(users.getThumb_image(), getApplicationContext());
+                if (!users.avata.equals(StaticConfig.STR_DEFAULT_BASE64)) {
+                    byte[] decodedString = Base64.decode(users.avata, Base64.DEFAULT);
+                    bitmapAvataUser = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                } else {
+                    bitmapAvataUser = null;
+                }
+                if (bitmapAvataUser!=null)
+                    usersViewHolder.setUserImage(bitmapAvataUser);
+
 
                 final String user_id = getRef(position).getKey();
 
@@ -123,11 +136,12 @@ public class UserActivityNew extends AppCompatActivity {
 
         }
 
-        public void setUserImage(String thumb_image, Context ctx) {
+        public void setUserImage(Bitmap bitmap) {
 
             CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
+            userImageView.setImageBitmap(bitmap);
 
-            Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.default_avata).into(userImageView);
+//            Picasso.with(ctx).load(bitmap).placeholder(R.drawable.default_avata).into(userImageView);
 
         }
 

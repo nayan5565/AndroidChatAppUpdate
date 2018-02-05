@@ -43,12 +43,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.UserActivityNew" />
-        <activity android:name=".activity.MainActivityNew"/>
-        <activity android:name=".activity.ChatActivityNew"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activity.MainActivityNew"/>
-        <activity android:name=".activity.FriendRequiestActivity"/>
+        <activity
+            android:name=".activity.UserActivityNew"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.MainActivityNew" />
+        <activity
+            android:name=".activity.ChatActivityNew"
+            android:parentActivityName=".activity.MainActivityNew"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.FriendRequiestActivity" />
 
         <service
             android:name=".service.FriendChatService"

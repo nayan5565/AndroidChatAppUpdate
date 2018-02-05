@@ -344,7 +344,7 @@ public class LoginActivityNew extends AppCompatActivity {
                     HashMap hashUser = (HashMap) dataSnapshot.getValue();
                     User userInfo = new User();
                     userInfo.userStatus = (String) hashUser.get("userStatus");
-//                    userInfo.deviceToken = (String) hashUser.get("deviceToken");
+                    userInfo.deviceToken = (String) hashUser.get("deviceToken");
                     userInfo.name = (String) hashUser.get("name");
                     userInfo.email = (String) hashUser.get("email");
                     userInfo.avata = (String) hashUser.get("avata");
@@ -363,7 +363,7 @@ public class LoginActivityNew extends AppCompatActivity {
             User newUser = new User();
             newUser.email = user.getEmail();
             newUser.userStatus = "Hi there I'm using Chat App.";
-//            newUser.deviceToken = device_token;
+            newUser.deviceToken = device_token;
             newUser.name = user.getEmail().substring(0, user.getEmail().indexOf("@"));
             newUser.avata = StaticConfig.STR_DEFAULT_BASE64;
             FirebaseDatabase.getInstance().getReference().child("user/" + user.getUid()).setValue(newUser);
