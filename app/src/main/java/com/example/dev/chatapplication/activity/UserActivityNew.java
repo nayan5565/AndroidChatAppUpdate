@@ -73,7 +73,7 @@ public class UserActivityNew extends AppCompatActivity {
 
         ) {
             @Override
-            protected void populateViewHolder(UsersViewHolder usersViewHolder, User users, int position) {
+            protected void populateViewHolder(UsersViewHolder usersViewHolder, final User users, int position) {
 
                 usersViewHolder.setDisplayName(users.name);
                 usersViewHolder.setUserStatus(users.userStatus);
@@ -96,6 +96,7 @@ public class UserActivityNew extends AppCompatActivity {
 
                         Intent profileIntent = new Intent(UserActivityNew.this, ProfileActivity.class);
                         profileIntent.putExtra("user_id", user_id);
+                        profileIntent.putExtra("name", users.name);
                         startActivity(profileIntent);
 
                     }

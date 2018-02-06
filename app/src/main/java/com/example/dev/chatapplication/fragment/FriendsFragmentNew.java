@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ public class FriendsFragmentNew extends Fragment {
 
     private DatabaseReference mFriendsDatabase;
     private DatabaseReference mUsersDatabase;
+    private DatabaseReference mDatabase;
 
     private FirebaseAuth mAuth;
 
@@ -59,6 +61,7 @@ public class FriendsFragmentNew extends Fragment {
 
     private ArrayList<String> listFriendID = null;
 
+    private int c;
 
     public FriendsFragmentNew() {
         // Required empty public constructor
@@ -113,7 +116,15 @@ public class FriendsFragmentNew extends Fragment {
                             Iterator listKey = mapRecord.keySet().iterator();
                             while (listKey.hasNext()) {
                                 String key = listKey.next().toString();
-                                listFriendID.add(mapRecord.get(key).toString());
+                                c++;
+                                if (!listFriendID.contains(mapRecord.get(key).toString()))
+                                    listFriendID.add(mapRecord.get(key).toString());
+                                Log.e("frnd", " size int " + c);
+                                mDatabase = FirebaseDatabase.getInstance().getReference().child("Friends_size").child(StaticConfig.UID);
+                                HashMap<String, Integer> userMap = new HashMap<>();
+                                userMap.put("name", listFriendID.size());
+
+                                mDatabase.setValue(userMap);
 
 
                             }

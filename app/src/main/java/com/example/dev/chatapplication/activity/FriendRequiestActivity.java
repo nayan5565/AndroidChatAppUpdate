@@ -55,8 +55,7 @@ public class FriendRequiestActivity extends AppCompatActivity {
         mFriendsList.setHasFixedSize(true);
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
         mFriendsList.setLayoutManager(new LinearLayoutManager(FriendRequiestActivity.this));
-        mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req").child( StaticConfig.UID);
-//        mFriendReqDatabase2= mFriendReqDatabase.child(mCurrent_user.getUid()).child("request_type").child("received");
+        mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req").child(mCurrent_user.getUid());
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user");
         mUsersDatabase.keepSynced(true);
         mFriendReqDatabase.keepSynced(true);
@@ -78,7 +77,7 @@ public class FriendRequiestActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final FriendRequiestActivity.FriendsViewHolder friendsViewHolder, Friends friends, int i) {
                 final String list_user_id = getRef(i).getKey();
-                FirebaseDatabase.getInstance().getReference().child("Friend_req/" + StaticConfig.UID).child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseDatabase.getInstance().getReference().child("Friend_req").child(mCurrent_user.getUid()).child(list_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.getValue() != null) {
@@ -127,8 +126,7 @@ public class FriendRequiestActivity extends AppCompatActivity {
                                     }
                                 });
 
-                            }
-                            else {
+                            } else {
                                 mFriendsList.setVisibility(View.GONE);
                             }
                             HashMap mapRecord = (HashMap) dataSnapshot.getValue();
@@ -147,9 +145,6 @@ public class FriendRequiestActivity extends AppCompatActivity {
                     }
                 });
                 friendsViewHolder.setDate(friends.getDate());
-
-
-
 
 
             }

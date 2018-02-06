@@ -1,7 +1,15 @@
 package com.example.dev.chatapplication.tools;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
+
+import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.activity.TabActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,5 +39,26 @@ public class Utils {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         String day = sdf.format(new Date());
         return day;
+    }
+
+    public static void createNotify(String name, String content, int id) {
+        Intent activityIntent = new Intent(MainApplication.getInstance().getContext(), TabActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(MainApplication.getInstance().getContext(), 0, activityIntent, PendingIntent.FLAG_ONE_SHOT);
+        NotificationCompat.Builder notificationBuilder = new
+                NotificationCompat.Builder(MainApplication.getInstance().getContext())
+                .setSmallIcon(R.drawable.default_avata)
+                .setContentTitle(name)
+                .setContentText(content)
+                .setContentIntent(pendingIntent)
+                .setVibrate(new long[] { 1000, 1000})
+                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+                .setAutoCancel(true);
+
+        NotificationManager notificationManager =
+                (NotificationManager) MainApplication.getInstance().getContext().getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(id);
+        notificationManager.notify(id,
+                notificationBuilder.build());
     }
 }

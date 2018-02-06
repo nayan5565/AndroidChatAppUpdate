@@ -170,24 +170,24 @@ public class ChatActivityNew extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-//                String online = dataSnapshot.child("online").getValue().toString();
+                String online = dataSnapshot.child("online").getValue().toString();
 //                String image = dataSnapshot.child("image").getValue().toString();
-//
-//                if(online.equals("true")) {
-//
-//                    mLastSeenView.setText("Online");
-//
-//                } else {
-//
-//                    GetTimeAgo getTimeAgo = new GetTimeAgo();
-//
-//                    long lastTime = Long.parseLong(online);
-//
-//                    String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
-//
-//                    mLastSeenView.setText(lastSeenTime);
-//
-//                }
+
+                if(online.equals("true")) {
+
+                    mLastSeenView.setText("Online");
+
+                } else {
+
+                    GetTimeAgo getTimeAgo = new GetTimeAgo();
+
+                    long lastTime = Long.parseLong(online);
+
+                    String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
+
+                    mLastSeenView.setText(lastSeenTime);
+
+                }
 
             }
 

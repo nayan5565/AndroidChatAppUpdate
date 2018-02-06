@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.model.Friend;
 import com.example.dev.chatapplication.tools.StaticConfig;
+import com.example.dev.chatapplication.tools.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,8 +38,10 @@ import com.squareup.picasso.Picasso;
 import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -54,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference mFriendReqDatabase;
     private DatabaseReference mFriendDatabase;
     private DatabaseReference mNotificationDatabase;
+    private DatabaseReference friendSizeDatabase;
 
     private DatabaseReference mRootRef;
 
@@ -62,27 +66,53 @@ public class ProfileActivity extends AppCompatActivity {
     private String mCurrent_state;
 
     public Bitmap bitmapAvataUser;
+    private ArrayList<String> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
+        mProfileFriendsCount = (TextView) findViewById(R.id.profile_totalFriends);
+        list = new ArrayList<>();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         final String user_id = getIntent().getStringExtra("user_id");
-        final String email = getIntent().getStringExtra("email");
 
+        final String email = getIntent().getStringExtra("name");
+        final int size = getIntent().getIntExtra("size", 0);
+//        Utils.createNotify(email, "hi", user_id.hashCode());
         mRootRef = FirebaseDatabase.getInstance().getReference();
 
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("user").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
+        friendSizeDatabase = FirebaseDatabase.getInstance().getReference().child("Friends_size").child(user_id);
+        friendSizeDatabase.keepSynced(true);
+        friendSizeDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.getValue() != null) {
+                    int size = Integer.parseInt(dataSnapshot.child("name").getValue().toString());
+                    Log.e("frnd", " list size 4 " + size);
+                    mProfileFriendsCount.setText("Total Friends(" + size + ")");
+                } else {
+                    mProfileFriendsCount.setText("Total Friends(0)");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
         mProfileImage = (ImageView) findViewById(R.id.profile_image);
         mProfileName = (TextView) findViewById(R.id.profile_displayName);
         mProfileStatus = (TextView) findViewById(R.id.profile_status);
-        mProfileFriendsCount = (TextView) findViewById(R.id.profile_totalFriends);
+
         mProfileSendReqBtn = (Button) findViewById(R.id.profile_send_req_btn);
         mDeclineBtn = (Button) findViewById(R.id.profile_decline_btn);
 
@@ -105,7 +135,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String display_name = dataSnapshot.child("name").getValue().toString();
-                String status = dataSnapshot.child("status").getValue().toString();
+                String status = dataSnapshot.child("online").getValue().toString();
                 String image = dataSnapshot.child("avata").getValue().toString();
 
 

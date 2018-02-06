@@ -15,8 +15,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 
 import com.example.dev.chatapplication.R;
+import com.example.dev.chatapplication.activity.FriendRequiestActivity;
+import com.example.dev.chatapplication.activity.ProfileActivity;
 import com.example.dev.chatapplication.activity.TabActivity;
 import com.example.dev.chatapplication.data.FriendDB;
 import com.example.dev.chatapplication.model.Friend;
@@ -27,10 +30,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -49,6 +54,7 @@ public class FriendChatService extends Service {
     public ListFriend listFriend;
 //    public ArrayList<Group> listGroup;
     public CountDownTimer updateOnline;
+    private ArrayList<String>listFrnd;
 
     public FriendChatService() {
     }
@@ -57,6 +63,7 @@ public class FriendChatService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        listFrnd=new ArrayList<>();
         mapMark = new HashMap<>();
         mapQuery = new HashMap<>();
         mapChildEventListenerMap = new HashMap<>();
@@ -76,6 +83,34 @@ public class FriendChatService extends Service {
             }
         };
         updateOnline.start();
+
+
+        FirebaseDatabase.getInstance().getReference().child("Friend_req/" + StaticConfig.UID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    HashMap mapRecord = (HashMap) dataSnapshot.getValue();
+                    Iterator listKey = mapRecord.keySet().iterator();
+                    while (listKey.hasNext()) {
+                        String key = listKey.next().toString();
+                        listFrnd.add(mapRecord.get(key).toString());
+                        String req_type = dataSnapshot.child(key).child("request_type").getValue().toString();
+                        if (req_type.equals("received")) {
+
+
+                        }
+                    }
+
+
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
         if (listFriend.getListFriend().size() > 0 ) {
             for (final Friend friend : listFriend.getListFriend()) {
@@ -200,6 +235,8 @@ public class FriendChatService extends Service {
         notificationManager.notify(id,
                 notificationBuilder.build());
     }
+
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

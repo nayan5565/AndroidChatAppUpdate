@@ -41,6 +41,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
@@ -75,6 +76,7 @@ public class UserProfileFragmentNew extends Fragment {
     private User myAccount;
     private Context context;
 
+
     public UserProfileFragmentNew() {
         // Required empty public constructor
     }
@@ -106,7 +108,7 @@ public class UserProfileFragmentNew extends Fragment {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(UserProfileFragment.class.getName(), "loadPost:onCancelled", databaseError.toException());
+            Log.e(UserProfileFragmentNew.class.getName(), "loadPost:onCancelled", databaseError.toException());
         }
     };
 
@@ -301,6 +303,7 @@ public class UserProfileFragmentNew extends Fragment {
                         FirebaseAuth.getInstance().signOut();
                         FriendDB.getInstance(getContext()).dropDB();
 //                        GroupDB.getInstance(getContext()).dropDB();
+                        userDB.child("online").setValue(ServerValue.TIMESTAMP);
                         ServiceUtils.stopServiceFriendChat(getContext().getApplicationContext(), true);
                         getActivity().finish();
                     }

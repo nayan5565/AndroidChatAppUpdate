@@ -56,7 +56,16 @@
         <service
             android:name=".service.FriendChatService"
             android:exported="false"
-            android:persistent="true" />
+            android:persistent="true" >
+
+        </service>
+
+        <service
+            android:name=".service.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
         <service android:name=".tools.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

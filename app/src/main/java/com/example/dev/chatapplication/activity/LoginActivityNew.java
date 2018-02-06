@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.yarolegovich.lovelydialog.LovelyInfoDialog;
 import com.yarolegovich.lovelydialog.LovelyProgressDialog;
 
@@ -358,8 +359,11 @@ public class LoginActivityNew extends AppCompatActivity {
             });
         }
 
+
+
         void initNewUserInfo() {
             String device_token = FirebaseInstanceId.getInstance().getToken();
+            Log.e("Toke"," " +device_token);
             User newUser = new User();
             newUser.email = user.getEmail();
             newUser.userStatus = "Hi there I'm using Chat App.";

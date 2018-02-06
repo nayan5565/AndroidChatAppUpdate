@@ -15,15 +15,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.fragment.FriendsFragment;
 import com.example.dev.chatapplication.fragment.FriendsFragmentNew;
-import com.example.dev.chatapplication.fragment.GroupFragment;
-import com.example.dev.chatapplication.fragment.UserProfileFragment;
 import com.example.dev.chatapplication.fragment.UserProfileFragmentNew;
 import com.example.dev.chatapplication.service.ServiceUtils;
+import com.example.dev.chatapplication.tools.FirebaseMessagingService;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Status;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class TabActivity extends AppCompatActivity {
     public static String STR_GROUP_FRAGMENT = "GROUP";
     public static String STR_INFO_FRAGMENT = "INFO";
 
-    private FloatingActionButton floatButton,fab;
+    private FloatingActionButton floatButton, fab;
     private ViewPagerAdapter adapter;
 
     private FirebaseAuth mAuth;
@@ -62,8 +61,14 @@ public class TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_activity);
-
+        FirebaseMessagingService firebaseMessagingService=new FirebaseMessagingService();
+        firebaseMessagingService.onCreate();
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.e("Token", " " + token);
         mAuth = FirebaseAuth.getInstance();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        Log.e("dispaly"," "+currentUser.getEmail());
+//        createNotify(currentUser.getEmail(),"hello", currentUser.getUid().hashCode());
         if (mAuth.getCurrentUser() != null) {
 
 
@@ -71,7 +76,7 @@ public class TabActivity extends AppCompatActivity {
 
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if(toolbar != null) {
+        if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setTitle("ChatApp");
         }
@@ -82,12 +87,15 @@ public class TabActivity extends AppCompatActivity {
         floatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(TabActivity.this,MainActivityNew.class));
+                startActivity(new Intent(TabActivity.this, MainActivityNew.class));
             }
         });
         initTab();
         initFirebase();
     }
+
+
+
 
     private void initFirebase() {
         status = new Status();
@@ -116,7 +124,7 @@ public class TabActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if(currentUser == null){
+        if (currentUser == null) {
 
 
         } else {
@@ -133,7 +141,8 @@ public class TabActivity extends AppCompatActivity {
         super.onStop();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if(currentUser != null) {
+
+        if (currentUser != null) {
 
             mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
 
@@ -210,7 +219,6 @@ public class TabActivity extends AppCompatActivity {
     }
 
 
-
     //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
@@ -266,14 +274,14 @@ public class TabActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
 
 
-        if(item.getItemId() == R.id.main_settings_btn){
+        if (item.getItemId() == R.id.main_settings_btn) {
 
             Intent settingsIntent = new Intent(TabActivity.this, FriendRequiestActivity.class);
             startActivity(settingsIntent);
 
         }
 
-        if(item.getItemId() == R.id.main_all_btn){
+        if (item.getItemId() == R.id.main_all_btn) {
 
             Intent settingsIntent = new Intent(TabActivity.this, UserActivityNew.class);
             startActivity(settingsIntent);
@@ -282,6 +290,7 @@ public class TabActivity extends AppCompatActivity {
 
         return true;
     }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
