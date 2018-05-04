@@ -36,13 +36,12 @@
 
     <ImageView
         android:id="@+id/user_single_online_icon"
-        android:layout_width="8dp"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_alignTop="@+id/user_single_name"
         android:layout_marginLeft="10dp"
         android:layout_toEndOf="@+id/user_single_name"
-        android:visibility="invisible"
-        android:tint="#000000"
-        android:background="@drawable/ic_add_friend"/>
+        android:src="@drawable/online_icon"
+        android:visibility="visible" />
 
 </RelativeLayout>

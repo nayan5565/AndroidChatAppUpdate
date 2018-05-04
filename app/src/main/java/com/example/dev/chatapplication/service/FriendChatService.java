@@ -21,7 +21,6 @@ import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.activity.FriendRequiestActivity;
 import com.example.dev.chatapplication.activity.ProfileActivity;
 import com.example.dev.chatapplication.activity.TabActivity;
-import com.example.dev.chatapplication.data.FriendDB;
 import com.example.dev.chatapplication.model.Friend;
 import com.example.dev.chatapplication.model.ListFriend;
 import com.example.dev.chatapplication.tools.StaticConfig;
@@ -52,9 +51,9 @@ public class FriendChatService extends Service {
     public Map<String, Bitmap> mapBitmap;
     public ArrayList<String> listKey;
     public ListFriend listFriend;
-//    public ArrayList<Group> listGroup;
+    //    public ArrayList<Group> listGroup;
     public CountDownTimer updateOnline;
-    private ArrayList<String>listFrnd;
+    private ArrayList<String> listFrnd;
 
     public FriendChatService() {
     }
@@ -63,11 +62,11 @@ public class FriendChatService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        listFrnd=new ArrayList<>();
+        listFriend=new ListFriend();
+        listFrnd = new ArrayList<>();
         mapMark = new HashMap<>();
         mapQuery = new HashMap<>();
         mapChildEventListenerMap = new HashMap<>();
-        listFriend = FriendDB.getInstance(this).getListFriend();
 //        listGroup = GroupDB.getInstance(this).getListGroups();
         listKey = new ArrayList<>();
         mapBitmap = new HashMap<>();
@@ -102,8 +101,6 @@ public class FriendChatService extends Service {
                     }
 
 
-
-
                 }
             }
 
@@ -112,7 +109,7 @@ public class FriendChatService extends Service {
             }
         });
 
-        if (listFriend.getListFriend().size() > 0 ) {
+        if (listFriend.getListFriend() != null || listFriend.getListFriend().size() > 0) {
             for (final Friend friend : listFriend.getListFriend()) {
                 if (!listKey.contains(friend.idRoom)) {
                     mapQuery.put(friend.idRoom, FirebaseDatabase.getInstance().getReference().child("message/" + friend.idRoom).limitToLast(1));
@@ -220,7 +217,7 @@ public class FriendChatService extends Service {
                 .setContentTitle(name)
                 .setContentText(content)
                 .setContentIntent(pendingIntent)
-                .setVibrate(new long[] { 1000, 1000})
+                .setVibrate(new long[]{1000, 1000})
                 .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
                 .setAutoCancel(true);
         if (isGroup) {
@@ -235,7 +232,6 @@ public class FriendChatService extends Service {
         notificationManager.notify(id,
                 notificationBuilder.build());
     }
-
 
 
     @Override

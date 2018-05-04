@@ -36,7 +36,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentBackground" />
-        <activity android:name=".activity.ChatActivity" />
         <activity
             android:name=".activity.StatusActivity"
             android:parentActivityName=".activity.SettingsActivity" />
@@ -50,10 +49,9 @@
         <activity
             android:name=".activity.UserActivityNew"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.MainActivityNew" />
         <activity
             android:name=".activity.ChatActivityNew"
-            android:parentActivityName=".activity.MainActivityNew"
+            android:parentActivityName=".activity.TabActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.FriendRequiestActivity" />
 

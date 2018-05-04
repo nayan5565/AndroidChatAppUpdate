@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dev.chatapplication.R;
-import com.example.dev.chatapplication.data.FriendDB;
 import com.example.dev.chatapplication.model.Configuration;
 import com.example.dev.chatapplication.model.User;
 import com.example.dev.chatapplication.service.ServiceUtils;
@@ -301,7 +300,6 @@ public class UserProfileFragmentNew extends Fragment {
                 public void onClick(View view) {
                     if(config.getLabel().equals(SIGNOUT_LABEL)){
                         FirebaseAuth.getInstance().signOut();
-                        FriendDB.getInstance(getContext()).dropDB();
 //                        GroupDB.getInstance(getContext()).dropDB();
                         userDB.child("online").setValue(ServerValue.TIMESTAMP);
                         ServiceUtils.stopServiceFriendChat(getContext().getApplicationContext(), true);

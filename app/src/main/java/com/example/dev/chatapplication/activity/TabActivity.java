@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.dev.chatapplication.R;
-import com.example.dev.chatapplication.fragment.FriendsFragment;
 import com.example.dev.chatapplication.fragment.FriendsFragmentNew;
 import com.example.dev.chatapplication.fragment.UserProfileFragmentNew;
 import com.example.dev.chatapplication.service.ServiceUtils;
@@ -47,7 +46,6 @@ public class TabActivity extends AppCompatActivity {
     public static String STR_GROUP_FRAGMENT = "GROUP";
     public static String STR_INFO_FRAGMENT = "INFO";
 
-    private FloatingActionButton floatButton, fab;
     private ViewPagerAdapter adapter;
 
     private FirebaseAuth mAuth;
@@ -82,14 +80,6 @@ public class TabActivity extends AppCompatActivity {
         }
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        floatButton = (FloatingActionButton) findViewById(R.id.fab);
-//        fab = (FloatingActionButton) findViewById(R.id.fab2);
-        floatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(TabActivity.this, MainActivityNew.class));
-            }
-        });
         initTab();
         initFirebase();
     }
@@ -196,19 +186,19 @@ public class TabActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 ServiceUtils.stopServiceFriendChat(TabActivity.this.getApplicationContext(), false);
-                if (adapter.getItem(position) instanceof FriendsFragment) {
-                    floatButton.setVisibility(View.VISIBLE);
-                    floatButton.setOnClickListener(((FriendsFragment) adapter.getItem(position)).onClickFloatButton.getInstance(TabActivity.this));
-                    floatButton.setImageResource(R.drawable.plus);
-                }
-//                else if (adapter.getItem(position) instanceof GroupFragment) {
+//                if (adapter.getItem(position) instanceof FriendsFragment) {
 //                    floatButton.setVisibility(View.VISIBLE);
-//                    floatButton.setOnClickListener(((GroupFragment) adapter.getItem(position)).onClickFloatButton.getInstance(MainActivity.this));
-//                    floatButton.setImageResource(R.drawable.ic_float_add_group);
+//                    floatButton.setOnClickListener(((FriendsFragment) adapter.getItem(position)).onClickFloatButton.getInstance(TabActivity.this));
+//                    floatButton.setImageResource(R.drawable.plus);
 //                }
-                else {
-                    floatButton.setVisibility(View.GONE);
-                }
+////                else if (adapter.getItem(position) instanceof GroupFragment) {
+////                    floatButton.setVisibility(View.VISIBLE);
+////                    floatButton.setOnClickListener(((GroupFragment) adapter.getItem(position)).onClickFloatButton.getInstance(MainActivity.this));
+////                    floatButton.setImageResource(R.drawable.ic_float_add_group);
+////                }
+//                else {
+//                    floatButton.setVisibility(View.GONE);
+//                }
             }
 
             @Override

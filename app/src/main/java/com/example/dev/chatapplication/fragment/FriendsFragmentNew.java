@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dev.chatapplication.R;
-import com.example.dev.chatapplication.activity.ChatActivity;
 import com.example.dev.chatapplication.activity.ChatActivityNew;
 import com.example.dev.chatapplication.activity.ProfileActivity;
 import com.example.dev.chatapplication.model.Friends;
