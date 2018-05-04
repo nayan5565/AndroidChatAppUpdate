@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.activity.ChatActivityNew;
 import com.example.dev.chatapplication.model.MessageNew2;
+import com.example.dev.chatapplication.tools.MainApplication;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -92,7 +94,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
+                DateFormat dateFormat = android.text.format.DateFormat.getTimeFormat(MainApplication.getInstance().getContext());
                 String name = dataSnapshot.child("name").getValue().toString();
                 String image = dataSnapshot.child("avata").getValue().toString();
                 Log.e("cun " + name, " fun " + ChatActivityNew.userName);
@@ -102,12 +104,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         Picasso.with(viewHolder.profileImage.getContext()).load(c.getImage())
                                 .placeholder(R.drawable.default_avatar).into(viewHolder.messageImage);
                         viewHolder.messageImage.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                    } else {
                         viewHolder.messageImage.setVisibility(View.GONE);
                     }
                     viewHolder.displayName.setText(name);
-                    viewHolder.time.setText(c.getTime() + "");
+                    viewHolder.time.setText(dateFormat.format(c.getTime()));
                     viewHolder.messageText.setText(c.getMessage());
                     viewHolder.relUser.setVisibility(View.GONE);
                     viewHolder.relFriend.setVisibility(View.VISIBLE);
@@ -117,11 +118,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         Picasso.with(viewHolder.profileImage.getContext()).load(c.getImage())
                                 .placeholder(R.drawable.default_avatar).into(viewHolder.messageImage2);
                         viewHolder.messageImage2.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                    } else {
                         viewHolder.messageImage2.setVisibility(View.GONE);
                     }
-                    viewHolder.time2.setText(c.getTime() + "");
+                    viewHolder.time2.setText(dateFormat.format(c.getTime()));
                     viewHolder.displayName2.setText(name);
                     viewHolder.messageText2.setText(c.getMessage());
                     viewHolder.relUser.setVisibility(View.VISIBLE);

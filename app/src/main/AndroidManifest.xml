@@ -27,10 +27,14 @@
         </activity>
         <activity
             android:name=".activity.RegistrationActvityNew"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/Translucent" />
         <activity android:name=".activity.SettingsActivity" />
         <activity
             android:name=".activity.LoginActivityNew"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentBackground" />
         <activity android:name=".activity.ChatActivity" />
         <activity
@@ -56,14 +60,13 @@
         <service
             android:name=".service.FriendChatService"
             android:exported="false"
-            android:persistent="true" >
+            android:persistent="true">
 
         </service>
 
-        <service
-            android:name=".service.MyFirebaseInstanceIDService">
+        <service android:name=".service.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <service android:name=".tools.FirebaseMessagingService">
