@@ -3,7 +3,6 @@ package com.example.dev.chatapplication.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,13 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.dev.chatapplication.R;
 import com.example.dev.chatapplication.fragment.FriendsFragmentNew;
 import com.example.dev.chatapplication.fragment.UserProfileFragmentNew;
+import com.example.dev.chatapplication.service.FirebaseMsgService;
 import com.example.dev.chatapplication.service.ServiceUtils;
-import com.example.dev.chatapplication.tools.FirebaseMessagingService;
 import com.example.dev.chatapplication.tools.StaticConfig;
 import com.example.dev.chatapplication.tools.Status;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,7 +57,7 @@ public class TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab_activity);
-        FirebaseMessagingService firebaseMessagingService=new FirebaseMessagingService();
+        FirebaseMsgService firebaseMessagingService=new FirebaseMsgService();
         firebaseMessagingService.onCreate();
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.e("Token", " " + token);

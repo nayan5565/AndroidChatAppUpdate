@@ -61,7 +61,6 @@ public class ChatActivityNew extends AppCompatActivity {
     public static String mChatUser;
     public static String mCurrentUserId;
     private Toolbar mChatToolbar;
-
     private DatabaseReference mRootRef;
 
     private TextView mTitleView;

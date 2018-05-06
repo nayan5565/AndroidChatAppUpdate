@@ -1,5 +1,6 @@
 package com.example.dev.chatapplication.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
@@ -67,16 +68,28 @@ public class ProfileActivity extends AppCompatActivity {
 
     public Bitmap bitmapAvataUser;
     private ArrayList<String> list;
+    private Button btnSendNot;
+    private String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        user_id = getIntent().getStringExtra("user_id");
+        btnSendNot = (Button) findViewById(R.id.btnSendNot);
+        btnSendNot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sendNotActivity = new Intent(ProfileActivity.this, SendNotificationActivity.class);
+                sendNotActivity.putExtra("user_id", user_id);
+                startActivity(sendNotActivity);
+            }
+        });
         mProfileFriendsCount = (TextView) findViewById(R.id.profile_totalFriends);
         list = new ArrayList<>();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        final String user_id = getIntent().getStringExtra("user_id");
+
 
         final String email = getIntent().getStringExtra("name");
         final int size = getIntent().getIntExtra("size", 0);

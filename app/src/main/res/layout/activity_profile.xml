@@ -72,4 +72,10 @@
         android:text="DECLINE FRIEND REQUEST"
         android:textColor="@android:color/white" />
 
+    <Button
+        android:id="@+id/btnSendNot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send Notification" />
+
 </RelativeLayout>
